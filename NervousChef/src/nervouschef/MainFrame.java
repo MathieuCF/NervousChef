@@ -1,14 +1,29 @@
+package nervouschef;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author lailx
  */
 public class MainFrame extends javax.swing.JFrame {
-    
+
+    private MenuPanel menuPanel;
+    private GameOverPanel gameOverPanel;
+    private GameScreen gameScreen;
+
+    private java.awt.CardLayout cardLayout;
+
+    private static final String MENU = "MENU";
+    private static final String GAME_OVER = "GAME_OVER";
+    private static final String GAME = "GAME";
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
 
     /**
@@ -16,6 +31,60 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        menuPanel = new MenuPanel();
+        gameOverPanel = new GameOverPanel();
+        gameScreen = new GameScreen();
+        cardLayout = (java.awt.CardLayout) cardPanel.getLayout();
+
+        cardPanel.add(menuPanel, MENU);
+        cardPanel.add(gameOverPanel, GAME_OVER);
+        cardPanel.add(gameScreen, GAME);
+
+        menuPanel.setStartListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showGame();
+            }
+        });
+
+        gameOverPanel.setExitListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMenu();
+            }
+        });
+
+        gameOverPanel.setRestartListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showGame();
+            }
+        });
+
+        gameScreen.setEndListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showGameOver();
+            }
+        });
+
+        showMenu();
+        pack();
+        setLocationRelativeTo(null);
+
+    }
+
+    public void showMenu() {
+        cardLayout.show(cardPanel, MENU);
+
+    }
+
+    public void showGameOver() {
+        cardLayout.show(cardPanel, GAME_OVER);
+    }
+
+    public void showGame() {
+        cardLayout.show(cardPanel, GAME);
     }
 
     /**
@@ -27,18 +96,13 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        cardPanel = new javax.swing.JPanel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new java.awt.CardLayout());
+
+        cardPanel.setLayout(new java.awt.CardLayout());
+        getContentPane().add(cardPanel, "card2");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -69,5 +133,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel cardPanel;
     // End of variables declaration//GEN-END:variables
+
 }

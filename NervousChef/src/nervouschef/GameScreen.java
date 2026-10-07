@@ -2,18 +2,28 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
+package nervouschef;
+
+import java.awt.event.ActionListener;
 
 /**
  *
  * @author lailx
  */
 public class GameScreen extends javax.swing.JPanel {
+     private GamePanel gamePanel;
 
     /**
      * Creates new form GameScreen
      */
     public GameScreen() {
         initComponents();
+        gamePanel = new GamePanel();
+        add(gamePanel, java.awt.BorderLayout.CENTER);
+        revalidate();
+        repaint();
+        
+
     }
 
     /**
@@ -25,19 +35,56 @@ public class GameScreen extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        jPanel1 = new javax.swing.JPanel();
+        scoreLabel = new javax.swing.JLabel();
+        timerLabel = new javax.swing.JLabel();
+        endGameButton = new javax.swing.JButton();
+
+        setLayout(new java.awt.BorderLayout());
+
+        scoreLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        scoreLabel.setForeground(new java.awt.Color(51, 0, 153));
+        scoreLabel.setText("Score: ");
+
+        timerLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        timerLabel.setForeground(new java.awt.Color(51, 0, 153));
+        timerLabel.setText("Time: ");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scoreLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 274, Short.MAX_VALUE)
+                .addComponent(timerLabel)
+                .addGap(17, 17, 17))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(timerLabel)
+                    .addComponent(scoreLabel))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
+
+        add(jPanel1, java.awt.BorderLayout.PAGE_START);
+
+        endGameButton.setText("End");
+        add(endGameButton, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
-
+    // registers listener when end button is clicked and MainFrame should call it
+    public void setEndListener(ActionListener listener){
+        endGameButton.addActionListener(listener);
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton endGameButton;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel scoreLabel;
+    private javax.swing.JLabel timerLabel;
     // End of variables declaration//GEN-END:variables
 }
