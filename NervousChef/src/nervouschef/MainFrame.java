@@ -102,7 +102,8 @@ public class MainFrame extends javax.swing.JFrame {
         
         
         //displays main menue when game starts
-        showMenu();
+        //showMenu();
+        showGame();
         //sizes the window
         pack();
         //places window in center of screen
