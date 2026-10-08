@@ -24,23 +24,28 @@ public class GameScreen extends javax.swing.JPanel {
 
     }
 
+    // starts game loop allows rendering to begin
     public void startGameLoop() {
         gamePanel.startGameLoop();
     }
 
+    // stops game loop pausing all game updates and rendering
     public void stopGameLoop() {
         gamePanel.stopGameLoop();
     }
     
+    // resets game to initial state
     public void reset() {
         gamePanel.reset();
     }
     
+    // updates score on screen
     public void setScore(int score) {
         scoreLabel.setText("Score: " + score);
         
     }
     
+    //updates timer  displayed on screen
     public void setTimer(String time) {
         timerLabel.setText("Time: " + time);
     }

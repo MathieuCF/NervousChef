@@ -39,18 +39,24 @@ public class GamePanel extends javax.swing.JPanel {
     private List<Point> trailPoints = new ArrayList<>();
     private Point previousPoint;
 
+    //constructor (initialsises its appearance and sets up game timer)
     public GamePanel() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setBackground(Color.BLUE);
+        
+        //updates game state at fixed intervals
         timer = new Timer(TICK_DELAY_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 x += 1;
 
+                //gradually removes old trail points so 
+                //the tail shrinks when mouse stops moving
                 if (!trailPoints.isEmpty()) {
                     trailPoints.remove(0);
-                    //shrinks tail when mouse stops moving
+               
                 }
+                //redraws panel with updated game state
                 repaint();
             }
 
@@ -60,9 +66,11 @@ public class GamePanel extends javax.swing.JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                //starts new slice by clearing previous tail
                 trailPoints.clear();
                 previousPoint = e.getPoint();
                 trailPoints.add(previousPoint);
+                //stores initial mouse position
 
             }
 
@@ -78,24 +86,27 @@ public class GamePanel extends javax.swing.JPanel {
 //                            + currentPoint.y);
                 previousPoint = currentPoint;
                 
+                //adds current mouse position to trail
                 trailPoints.add(currentPoint);
+                // remove first/oldest point in list so the front of the tail disappears
                 if (trailPoints.size() > MAX_TRAIL_POINTS) {
                     trailPoints.remove(0);
-                    // remove first/oldest point in list so the front of the tail disappears
+                    
                 }
 
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                //clears trail and resets previous points so separate slices are not connected
                 trailPoints.clear();
                 previousPoint = null;
-                //reset previous point after every drag to generate a new drag and not connect two unrelated points
                 repaint();
 
             }
         };
 
+        //register mouse handler for click and drag events
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
 
@@ -106,10 +117,12 @@ public class GamePanel extends javax.swing.JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
+        // enables smooth rendering for lines and shapes
         g2.setRenderingHint(
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
+        //draw the slicing trail
         g2.setColor(Color.WHITE);
         for (int i = 1; i < trailPoints.size(); i++) {
             Point p1 = trailPoints.get(i - 1);
@@ -118,6 +131,7 @@ public class GamePanel extends javax.swing.JPanel {
             g2.drawLine(p1.x, p1.y, p2.x, p2.y);
         }
 
+        //draw game object
         g2.setColor(Color.RED);
         g2.fillOval(x, y, OBJECT_DIAMETER, OBJECT_DIAMETER);
     }
@@ -132,6 +146,7 @@ public class GamePanel extends javax.swing.JPanel {
         timer.stop();
     }
 
+    //resets game object to its starting position
     public void reset() {
         x = START_X;
         y = START_Y;
