@@ -13,17 +13,17 @@ import java.awt.event.ActionListener;
  * @author lailx
  */
 public class MainFrame extends javax.swing.JFrame {
-
+    
     private MenuPanel menuPanel;
     private GameOverPanel gameOverPanel;
     private GameScreen gameScreen;
-
+    
     private java.awt.CardLayout cardLayout;
-
+    
     private static final String MENU = "MENU";
     private static final String GAME_OVER = "GAME_OVER";
     private static final String GAME = "GAME";
-
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
 
     /**
@@ -35,55 +35,71 @@ public class MainFrame extends javax.swing.JFrame {
         gameOverPanel = new GameOverPanel();
         gameScreen = new GameScreen();
         cardLayout = (java.awt.CardLayout) cardPanel.getLayout();
-
+        
+        gameScreen.setScore(0);
+        gameScreen.setTimer("3:00");
+        
         cardPanel.add(menuPanel, MENU);
         cardPanel.add(gameOverPanel, GAME_OVER);
         cardPanel.add(gameScreen, GAME);
-
+        
         menuPanel.setStartListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showGame();
             }
         });
-
-        gameOverPanel.setExitListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showMenu();
-            }
-        });
-
-        gameOverPanel.setRestartListener(new ActionListener() {
+        
+        gameOverPanel.setResumeListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showGame();
             }
         });
-
-        gameScreen.setEndListener(new ActionListener() {
+        
+        gameOverPanel.setRestartListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showGameOver();
+                gameScreen.reset();
+                showGame();
             }
         });
-
+        
+        gameOverPanel.setExitListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+                //closes app
+            }
+        });
+        
+        gameScreen.setPauseListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showGameOver(123);
+            }
+        });
+        
         showMenu();
         pack();
         setLocationRelativeTo(null);
-
+        
     }
-
+    
     public void showMenu() {
+        gameScreen.stopGameLoop();
         cardLayout.show(cardPanel, MENU);
-
+        
     }
-
-    public void showGameOver() {
+    
+    public void showGameOver(int score) {
+        gameScreen.stopGameLoop();
+        gameOverPanel.setScore(score);
         cardLayout.show(cardPanel, GAME_OVER);
     }
-
+    
     public void showGame() {
+        gameScreen.startGameLoop();
         cardLayout.show(cardPanel, GAME);
     }
 

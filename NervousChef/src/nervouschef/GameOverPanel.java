@@ -32,8 +32,9 @@ public class GameOverPanel extends javax.swing.JPanel {
 
         scoreLabel = new javax.swing.JLabel();
         restartButton = new javax.swing.JButton();
+        resumeButton = new javax.swing.JButton();
+        gameOverLabel = new javax.swing.JLabel();
         exitButton = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -49,7 +50,7 @@ public class GameOverPanel extends javax.swing.JPanel {
         gridBagConstraints.ipadx = 146;
         gridBagConstraints.ipady = -5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 64, 0, 64);
+        gridBagConstraints.insets = new java.awt.Insets(6, 43, 0, 0);
         add(scoreLabel, gridBagConstraints);
 
         restartButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -59,30 +60,41 @@ public class GameOverPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 87, 36, 0);
+        gridBagConstraints.insets = new java.awt.Insets(12, 23, 14, 0);
         add(restartButton, gridBagConstraints);
+
+        resumeButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        resumeButton.setForeground(new java.awt.Color(51, 0, 153));
+        resumeButton.setText("Resume");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 38, 14, 0);
+        add(resumeButton, gridBagConstraints);
+
+        gameOverLabel.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
+        gameOverLabel.setForeground(new java.awt.Color(51, 0, 153));
+        gameOverLabel.setText("Game Over ");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.ipadx = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(54, 57, 0, 0);
+        add(gameOverLabel, gridBagConstraints);
 
         exitButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         exitButton.setForeground(new java.awt.Color(51, 0, 153));
         exitButton.setText("Exit");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 44, 36, 0);
+        gridBagConstraints.insets = new java.awt.Insets(12, 38, 14, 23);
         add(exitButton, gridBagConstraints);
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(51, 0, 153));
-        jLabel2.setText("Game Over ");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.ipadx = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(36, 64, 0, 64);
-        add(jLabel2, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
 // registers listener when restart button is clicked and MainFrame should call it
@@ -90,6 +102,11 @@ public class GameOverPanel extends javax.swing.JPanel {
         restartButton.addActionListener(listener);
     }
 
+    // registers listener when resume button is clicked and MainFrame should call it
+    public void setResumeListener(ActionListener listener) {
+        resumeButton.addActionListener(listener);
+    }
+    
     // registers listener when exit button is clicked and MainFrame should call it
     public void setExitListener(ActionListener listener) {
         exitButton.addActionListener(listener);
@@ -100,8 +117,10 @@ public class GameOverPanel extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exitButton;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel gameOverLabel;
     private javax.swing.JButton restartButton;
+    private javax.swing.JButton resumeButton;
     private javax.swing.JLabel scoreLabel;
     // End of variables declaration//GEN-END:variables
+
 }
