@@ -41,6 +41,9 @@ public class GamePanel extends javax.swing.JPanel {
                 }
                 if (testFruit != null) {
                     testFruit.update(); // Update physics every frame
+                    if (testFruit.getY() >= 500) {  // Resetting block if out of bounds
+                        testFruit.resetTest(500, 400);
+                    }
                 }
                 repaint();
             }
@@ -63,6 +66,14 @@ public class GamePanel extends javax.swing.JPanel {
                 if (trailPoints.size() > MAX_TRAIL_POINTS) {
                     trailPoints.remove(0);
                 }
+                boolean hasMouseMoved = previousPoint != null && currentPoint != null;
+                
+//                if (hasMouseMoved) {
+//                    boolean isSliced = intersects(previousPoint, currentPoint, testFruit);
+//                    if (isSliced) {
+//                        testFruit.slice();
+//                    }
+//                }
             }
 
             @Override

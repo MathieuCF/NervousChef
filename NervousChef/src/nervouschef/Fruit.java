@@ -4,19 +4,19 @@
  */
 package nervouschef;
 
-public class Fruit extends flyingObject {
+public class Fruit extends FlyingObject {
 
     public Fruit(double startX, double startY) {
         super(startX, startY);
     }
 
     @Override
-    public void slice() {
-        // Will implement in Step 4
-    }
-
-    @Override
     public boolean isCompleted() {
         return false; // Placeholder
+    }
+    
+    @Override
+    public void slice() {
+       return; // Placeholder
     }
 }

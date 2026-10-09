@@ -10,5 +10,7 @@ package nervouschef;
  * @author lailx
  */
 public class Game {
+
+}
     
 }
