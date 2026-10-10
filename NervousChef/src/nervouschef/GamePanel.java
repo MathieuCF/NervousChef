@@ -25,8 +25,8 @@ public class GamePanel extends javax.swing.JPanel {
     private List<Point> trailPoints = new ArrayList<>();
     private Point previousPoint;
 
-    // Create our test fruit object instance (Step 1 test)
-    private Fruit testFruit = new Fruit(500,400);
+    // Test fruit instance spawned lower down so it arcs up into view
+    private Fruit testFruit = new Fruit(600, 450);
 
     public GamePanel() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
@@ -35,16 +35,21 @@ public class GamePanel extends javax.swing.JPanel {
         timer = new Timer(TICK_DELAY_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Gradually remove old trail points
+                // Gradually remove old trail points for fading effect
                 if (!trailPoints.isEmpty()) {
                     trailPoints.remove(0);
                 }
+
+                // Update physics every frame
                 if (testFruit != null) {
-                    testFruit.update(); // Update physics every frame
-                    if (testFruit.getY() >= 500) {  // Resetting block if out of bounds
-                        testFruit.resetTest(500, 400);
+                    testFruit.update(); 
+                    
+                    // Reset block if it falls off the bottom of the screen
+                    if (testFruit.getY() >= PANEL_HEIGHT + 50) {
+                        testFruit.resetTest(600, 450);
                     }
                 }
+                
                 repaint();
             }
         });
@@ -60,20 +65,24 @@ public class GamePanel extends javax.swing.JPanel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 Point currentPoint = e.getPoint();
-                previousPoint = currentPoint;
 
+                // Add point to visual trail
                 trailPoints.add(currentPoint);
                 if (trailPoints.size() > MAX_TRAIL_POINTS) {
                     trailPoints.remove(0);
                 }
-                boolean hasMouseMoved = previousPoint != null && currentPoint != null;
+
+                // Slice intersection check between previousPoint and currentPoint
+                if (testFruit != null && !testFruit.isCompleted()) {
+                    // Turning positions to int for easier pixel calculations
+                    int tx = (int) testFruit.getX();
+                    int ty = (int) testFruit.getY();
+                    int tSize = (int) (testFruit.getRadius() * 2);
+                }
                 
-//                if (hasMouseMoved) {
-//                    boolean isSliced = intersects(previousPoint, currentPoint, testFruit);
-//                    if (isSliced) {
-//                        testFruit.slice();
-//                    }
-//                }
+
+                // Update previousPoint for the next drag event
+                previousPoint = currentPoint;
             }
 
             @Override
@@ -98,31 +107,28 @@ public class GamePanel extends javax.swing.JPanel {
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // 1. Draw Laila's slicing trail
+        // 1. Draw the slicing trail
         g2.setColor(Color.WHITE);
-        for (int i = 1; i < trailPoints.size(); i++) {
-            Point p1 = trailPoints.get(i - 1);
-            Point p2 = trailPoints.get(i);
+        for (int i = 0; i < trailPoints.size() - 1; i++) {
+            Point p1 = trailPoints.get(i);
+            Point p2 = trailPoints.get(i + 1);
             g2.drawLine(p1.x, p1.y, p2.x, p2.y);
         }
 
-        // 2. Step 1: Draw the Fruit's placeholder square!
+        // 2. Draw the test fruit / cube
         if (testFruit != null) {
             testFruit.draw(g2);
         }
     }
 
-    // Starts game loop timer
     public void startGameLoop() {
         timer.start();
     }
 
-    // Stops game loop timer
     public void stopGameLoop() {
         timer.stop();
     }
 
-    // Resets the game panel state
     public void reset() {
         if (trailPoints != null) {
             trailPoints.clear();
