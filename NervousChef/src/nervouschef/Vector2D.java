@@ -7,10 +7,10 @@ import java.awt.Point;
  * @author 20254337
  */
 public class Vector2D {
-    public final double x;
-    public final double y;
+    public final int x;
+    public final int y;
 
-    public Vector2D(double x, double y) {
+    public Vector2D(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -21,19 +21,11 @@ public class Vector2D {
     }
 
     public double getMagnitude() {  // gets vector length
-        return Math.sqrt(x * x + y * y);
+        return Math.sqrt((double) x * x + (double) y * y);
     }
 
     public double dot(Vector2D other) {  // gets dot product between this vector and another one
-        return this.x * other.x + this.y * other.y;
-    }
-    
-    public Vector2D normalize() {
-        double mag = getMagnitude();
-        if (mag == 0) {
-            return new Vector2D(0, 0);
-        }
-        return new Vector2D(x / mag, y / mag);
+        return (double) this.x * other.x + (double) this.y * other.y;
     }
 
     /**
@@ -44,7 +36,7 @@ public class Vector2D {
         Vector2D ab = Vector2D.between(a, b);
         Vector2D ap = Vector2D.between(a, p);
 
-        double abLenSq = ab.x * ab.x + ab.y * ab.y;
+        double abLenSq = (double) ab.x * ab.x + (double) ab.y * ab.y;
 
         // If A and B are the exact same point, the segment is just a single point.
         if (abLenSq == 0) {
