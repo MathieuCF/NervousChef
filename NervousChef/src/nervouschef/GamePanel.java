@@ -46,7 +46,7 @@ public class GamePanel extends javax.swing.JPanel {
                     
                     // Reset block if it falls off the bottom of the screen
                     if (testFruit.getY() >= PANEL_HEIGHT + 50) {
-                        testFruit.resetTest(600, 450);
+                        testFruit.reset(600, 450);
                     }
                 }
                 
@@ -74,10 +74,10 @@ public class GamePanel extends javax.swing.JPanel {
 
                 // Slice intersection check between previousPoint and currentPoint
                 if (testFruit != null && !testFruit.isCompleted()) {
-                    // Turning positions to int for easier pixel calculations
-                    int tx = (int) testFruit.getX();
-                    int ty = (int) testFruit.getY();
-                    int tSize = (int) (testFruit.getRadius() * 2);
+                    if (testFruit.lineIntersectsFruit(previousPoint, currentPoint)) {
+                        //SEND SLICE
+                        testFruit.slice();
+                    }
                 }
                 
 

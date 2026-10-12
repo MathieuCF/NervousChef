@@ -2,6 +2,7 @@ package nervouschef;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 
 public class Fruit extends FlyingObject {
 
@@ -21,6 +22,22 @@ public class Fruit extends FlyingObject {
     public void slice() {
         this.isSliced = true; // Flips the state when sliced!
         System.out.println("Fruit sliced!");
+    }
+    
+    @Override
+    public void reset(double startX, double startY) {
+        super.reset(startX, startY);  // reset physics
+        this.isSliced = false;  // reset colour
+    }
+    
+    public boolean lineIntersectsFruit(Point A, Point B) {  // Detects if two points of the slice crossed this fruit
+            /**
+             * For this, we can use our specially built Vector2D 
+             * helper function that will do a lot of the math for us
+             */
+            Point fruitCenter = new Point((int) (x + radius), (int) (y + radius));
+            
+            return (Vector2D.shortestDistanceToSegment(A, B, fruitCenter) <= radius);  // Mouse passed through fruit hitbox
     }
 
     @Override
