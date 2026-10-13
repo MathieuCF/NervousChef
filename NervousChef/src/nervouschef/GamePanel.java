@@ -35,6 +35,8 @@ public class GamePanel extends javax.swing.JPanel {
 
         // 2. Add the test fruit to active objects inside the constructor
         testFruit.subFruit = false;
+        testFruit.setXVelocity(-3.5);
+        testFruit.setYVelocity(-12);
         activeObjects.add(testFruit);
 
         timer = new Timer(TICK_DELAY_MS, new ActionListener() {

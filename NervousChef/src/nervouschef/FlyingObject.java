@@ -12,8 +12,6 @@ public abstract class FlyingObject {
     public FlyingObject(double startX, double startY, double radius) {
         this.x = startX;
         this.y = startY;
-        this.vx = -3.5;  // Initial leftward push
-        this.vy = -12.0; // Initial upward launch push
         this.radius = 25;
     }
 
@@ -32,10 +30,21 @@ public abstract class FlyingObject {
         this.vx = -3.5;
         this.vy = -12.0;
     }
+    
+    public void setXVelocity(double vx) {
+        this.vx = vx;
+    }
+    
+    public void setYVelocity(double vy) {
+        this.vy = vy;
+    }
+
 
     // Getters
     public double getX() { return x; }
     public double getY() { return y; }
+    public double getVx() { return vx; }
+    public double getVy() { return vy; }
     public double getRadius() { return radius; }
 
     // Abstract methods that subclasses (like Fruit) must implement

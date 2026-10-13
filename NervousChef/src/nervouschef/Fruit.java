@@ -4,10 +4,16 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
+
+
 public class Fruit extends FlyingObject {
     private GamePanel gamePanel; // Reference to the main game
     private boolean isSliced = false;
     public boolean subFruit = true;
+    private double minXSepVel = 2.0;
+    private double maxXSepVel = 12.0;
+    private double minYSepVel = 2.0;
+    private double maxYSepVel = 12.0;
 
     public Fruit(double startX, double startY, double radius, GamePanel gamePanel) {
         super(startX, startY, radius);
@@ -24,9 +30,9 @@ public class Fruit extends FlyingObject {
         return subFruit;
     }
         
-    public void createHalves(Fruit wholeFruit, Vector2D cutDir, double sizeMultiplier) {
+    public void createHalves(Fruit wholeFruit, Vector2D cutVector, double sizeMultiplier) {
         // Creating a normal vector to cut 90° counter-clockwise: (-y, x)
-        Vector2D normalToCut = new Vector2D(-cutDir.y, cutDir.x);
+        Vector2D normalToCut = new Vector2D(-cutVector.y, cutVector.x);
         
         Vector2D normalNormalized = normalToCut.normalize();
         
@@ -47,6 +53,23 @@ public class Fruit extends FlyingObject {
         // Creating fruit halves
         Fruit half1 = new Fruit(absX1, absY1, wholeFruit.radius * sizeMultiplier, gamePanel);
         Fruit half2 = new Fruit(absX2, absY2, wholeFruit.radius * sizeMultiplier, gamePanel);
+        
+        // Giving them separation velocities
+        // 1. Determine how fast the cut was (magnitude of the normal vector)
+        double cutSpeedX = Math.clamp(Math.abs(normalToCut.x), minXSepVel, maxXSepVel);
+        double cutSpeedY = Math.clamp(Math.abs(normalToCut.y), minYSepVel, maxYSepVel);
+
+        // 2. Apply the speed in the correct positive/negative directions
+        // half1 moves along the natural normal vector directions
+        half1.setXVelocity(wholeFruit.getVx() + (Math.signum(normalToCut.x) * cutSpeedX));
+        half1.setYVelocity(wholeFruit.getVy() + (Math.signum(normalToCut.y) * cutSpeedY));
+
+        // half2 moves in the exact opposite directions
+        half2.setXVelocity(wholeFruit.getVx() - (Math.signum(normalToCut.x) * cutSpeedX));
+        half2.setYVelocity(wholeFruit.getVy() - (Math.signum(normalToCut.y) * cutSpeedY));
+
+
+        
         
         gamePanel.unspawnObject(wholeFruit);
         gamePanel.spawnObject(half1);
