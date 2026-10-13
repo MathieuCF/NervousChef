@@ -43,8 +43,8 @@ public class Fruit extends FlyingObject {
         Fruit half1 = new Fruit(absX1, absY1, wholeFruit.radius * sizeMultipler, gamePanel);
         Fruit half2 = new Fruit(absX2, absY2, wholeFruit.radius * sizeMultipler, gamePanel);
         
-        //gamePanel.spawnObject(half1);
-        //gamePanel.spawnObject(half2);
+        gamePanel.spawnObject(half1);
+        gamePanel.spawnObject(half2);
     }
     
             
