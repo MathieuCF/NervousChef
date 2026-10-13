@@ -26,7 +26,7 @@ public class GamePanel extends javax.swing.JPanel {
     private Point previousPoint;
 
     // Test fruit instance spawned lower down so it arcs up into view
-    private Fruit testFruit = new Fruit(600, 450);
+    private Fruit testFruit = new Fruit(600, 450, 25, this);
 
     public GamePanel() {
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));

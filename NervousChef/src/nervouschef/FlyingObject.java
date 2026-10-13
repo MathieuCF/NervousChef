@@ -1,43 +1,45 @@
 package nervouschef;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 
-
-public abstract class flyingObject {
-    // 1. Position and dimensions
+public abstract class FlyingObject {
     protected double x;
     protected double y;
-    protected double gravity = 0.2;
-    protected double v_y = -10;
-    protected double v_x = -2.5;
-    protected int width = 40;
-    protected int height = 40;
+    protected double vx; // Horizontal velocity (moves left/right)
+    protected double vy; // Vertical velocity (gravity / up/down)
+    protected double radius = 25; // Default size/radius
 
-    // Constructor with a test starting position
-    public flyingObject(double startX, double startY) {
+    public FlyingObject(double startX, double startY, double radius) {
         this.x = startX;
         this.y = startY;
-    }
-    
-    public void update() {
-        x += v_x;
-        y += v_y;
-        v_y += gravity;
+        this.vx = -3.5;  // Initial leftward push
+        this.vy = -12.0; // Initial upward launch push
+        this.radius = 25;
     }
 
-    // Getters needed for logic/GUI
+    // Full physics update (Arc trajectory)
+    public void update() {
+        double gravity = 0.4;
+        vy += gravity; // Pulls down over time
+        x += vx;       // Moves horizontally
+        y += vy;       // Moves vertically
+    }
+
+    // Reset method for re-launching the test object
+    public void reset(double startX, double startY) {
+        this.x = startX;
+        this.y = startY;
+        this.vx = -3.5;
+        this.vy = -12.0;
+    }
+
+    // Getters
     public double getX() { return x; }
     public double getY() { return y; }
+    public double getRadius() { return radius; }
 
-    // 2. Step 1 Drawing Method: Renders a simple red square placeholder
-    public void draw(Graphics g) {
-        g.setColor(Color.RED);
-        // Cast double coordinates to int for pixel rendering
-        g.fillRect((int) x, (int) y, width, height);
-    }
-    
-    // Abstract methods required by your project plan
+    // Abstract methods that subclasses (like Fruit) must implement
     public abstract void slice();
     public abstract boolean isCompleted();
+    public abstract void draw(Graphics2D g2);
 }
