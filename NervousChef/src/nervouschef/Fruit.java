@@ -7,6 +7,7 @@ import java.awt.Point;
 public class Fruit extends FlyingObject {
     private GamePanel gamePanel; // Reference to the main game
     private boolean isSliced = false;
+    public boolean subFruit = true;
 
     public Fruit(double startX, double startY, double radius, GamePanel gamePanel) {
         super(startX, startY, radius);
@@ -18,8 +19,12 @@ public class Fruit extends FlyingObject {
     public boolean isCompleted() {
         return isSliced; // Placeholder / state tracker
     }
+    
+    public boolean isSubFruit() {
+        return subFruit;
+    }
         
-    public void createHalf(Fruit wholeFruit, Vector2D cutDir, double sizeMultipler) {
+    public void createHalves(Fruit wholeFruit, Vector2D cutDir, double sizeMultiplier) {
         // Creating a normal vector to cut 90° counter-clockwise: (-y, x)
         Vector2D normalToCut = new Vector2D(-cutDir.y, cutDir.x);
         
@@ -40,17 +45,18 @@ public class Fruit extends FlyingObject {
         
         
         // Creating fruit halves
-        Fruit half1 = new Fruit(absX1, absY1, wholeFruit.radius * sizeMultipler, gamePanel);
-        Fruit half2 = new Fruit(absX2, absY2, wholeFruit.radius * sizeMultipler, gamePanel);
+        Fruit half1 = new Fruit(absX1, absY1, wholeFruit.radius * sizeMultiplier, gamePanel);
+        Fruit half2 = new Fruit(absX2, absY2, wholeFruit.radius * sizeMultiplier, gamePanel);
         
+        gamePanel.unspawnObject(wholeFruit);
         gamePanel.spawnObject(half1);
         gamePanel.spawnObject(half2);
     }
     
             
-    @Override
-    public void slice() {
+    public void slice(Vector2D cutDir, double sizeMultiplier) {
         this.isSliced = true; // Flips the state when sliced!
+        createHalves(this, cutDir, sizeMultiplier);
         
     }
     

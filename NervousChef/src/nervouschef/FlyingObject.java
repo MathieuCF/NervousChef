@@ -39,7 +39,6 @@ public abstract class FlyingObject {
     public double getRadius() { return radius; }
 
     // Abstract methods that subclasses (like Fruit) must implement
-    public abstract void slice();
     public abstract boolean isCompleted();
     public abstract void draw(Graphics2D g2);
 }
