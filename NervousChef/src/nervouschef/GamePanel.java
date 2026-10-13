@@ -23,6 +23,7 @@ public class GamePanel extends javax.swing.JPanel {
 
     private final Timer timer;
     private List<Point> trailPoints = new ArrayList<>();
+    private List<FlyingObject> activeObjects = new ArrayList<>();
     private Point previousPoint;
 
     // Test fruit instance spawned lower down so it arcs up into view
@@ -53,6 +54,8 @@ public class GamePanel extends javax.swing.JPanel {
                 repaint();
             }
         });
+        
+        //public void spawnObject()
 
         MouseAdapter mouseHandler = new MouseAdapter() {
             @Override
@@ -116,8 +119,10 @@ public class GamePanel extends javax.swing.JPanel {
         }
 
         // 2. Draw the test fruit / cube
-        if (testFruit != null) {
-            testFruit.draw(g2);
+        for (FlyingObject obj : activeObjects) {
+            if (obj != null) {
+            obj.draw(g2);
+        }
         }
     }
 
