@@ -1,6 +1,7 @@
 package nervouschef;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 public abstract class FlyingObject {
     protected double x;
@@ -49,5 +50,5 @@ public abstract class FlyingObject {
 
     // Abstract methods that subclasses (like Fruit) must implement
     public abstract boolean isCompleted();
-    public abstract void draw(Graphics2D g2);
+    public abstract void draw(Graphics2D g2, BufferedImage appleImage);
 }
