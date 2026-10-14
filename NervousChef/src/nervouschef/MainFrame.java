@@ -40,7 +40,8 @@ public class MainFrame extends javax.swing.JFrame {
         cardLayout = (java.awt.CardLayout) cardPanel.getLayout();
         
         gameScreen.setScore(0);
-        gameScreen.setTimer("3:00");
+        // display initial timer value
+        gameScreen.setTimer(String.valueOf(gameScreen.getSecondsRemaining()));
         
         cardPanel.add(menuPanel, MENU);
         cardPanel.add(gameOverPanel, GAME_OVER);
@@ -100,6 +101,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         
+        // handles game timer reaching 0
+        gameScreen.setTimerExpiredListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showGameOver(0); // replace with actual score later
+            }
+        });
+        
         
         //displays main menue when game starts
         showMenu();
@@ -111,7 +120,7 @@ public class MainFrame extends javax.swing.JFrame {
         
     }
     
-    //returns player to the main menu and stops game loop
+    //displays main menu and stops game loop
     public void showMenu() {
         gameScreen.stopGameLoop();
         cardLayout.show(cardPanel, MENU);
@@ -135,6 +144,7 @@ public class MainFrame extends javax.swing.JFrame {
         gameScreen.stopGameLoop();
         cardLayout.show(cardPanel, PAUSE);
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.

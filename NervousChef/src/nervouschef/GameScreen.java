@@ -5,6 +5,8 @@
 package nervouschef;
 
 import java.awt.event.ActionListener;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
 
 /**
  *
@@ -13,6 +15,7 @@ import java.awt.event.ActionListener;
 public class GameScreen extends javax.swing.JPanel {
 
     private final GamePanel gamePanel;
+    private Timer hudTimer;
 
     /**
      * Creates new form GameScreen
@@ -21,6 +24,21 @@ public class GameScreen extends javax.swing.JPanel {
         initComponents();
         gamePanel = new GamePanel();
         add(gamePanel, java.awt.BorderLayout.CENTER);
+
+        // updates the timer label while the game is running
+        hudTimer = new Timer(250, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                setTimer(
+                        String.valueOf(
+                                gamePanel.getSecondsRemaining()
+                        )
+                );
+            }
+        });
+
+        hudTimer.start();
 
     }
 
@@ -33,21 +51,31 @@ public class GameScreen extends javax.swing.JPanel {
     public void stopGameLoop() {
         gamePanel.stopGameLoop();
     }
-    
+
     // resets game to initial state
     public void reset() {
         gamePanel.reset();
     }
-    
+
+    // returns remaining time in seconds
+    public int getSecondsRemaining() {
+        return gamePanel.getSecondsRemaining();
+    }
+
     // updates score on screen
     public void setScore(int score) {
         scoreLabel.setText("Score: " + score);
-        
+
     }
-    
+
     //updates timer  displayed on screen
     public void setTimer(String time) {
         timerLabel.setText("Time: " + time);
+    }
+
+    // registers listener when countdown reaches 0
+    public void setTimerExpiredListener(ActionListener listener) {
+        gamePanel.setTimerExpiredListener(listener);
     }
 
     /**

@@ -29,6 +29,9 @@ public class GamePanel extends javax.swing.JPanel {
     private List<FlyingObject> activeObjects = new ArrayList<>();
     private Point previousPoint;
     private BufferedImage appleImage;
+    private CountdownTimer gameTimer;
+    private long previousTickTime;
+    private ActionListener timerExpiredListener;
 
     // 1. Declare the test fruit field here at the top
     private Fruit testFruit = new Fruit(600, 450, 25, this);
@@ -51,10 +54,35 @@ public class GamePanel extends javax.swing.JPanel {
         testFruit.setYVelocity(-12);
         activeObjects.add(testFruit);
 
+        // create timer
+        gameTimer = new CountdownTimer(30000); // temp num for testing only 30s
+
         timer = new Timer(TICK_DELAY_MS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Gradually remove old trail points for fading effect
+                // calculate real time passed since the previous game tick
+                long currentTime = System.currentTimeMillis();
+
+                long elapsedMs = currentTime - previousTickTime;
+
+                previousTickTime = currentTime;
+
+                // update countdown timer
+                gameTimer.update(elapsedMs);
+
+                // stops game when timer reaches zero
+                if (gameTimer.isFinished()) {
+                    stopGameLoop();
+                    
+                    // notify MainFrame that timer expired
+                    if (timerExpiredListener != null) {
+                        timerExpiredListener.actionPerformed(
+                                new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "TIME_UP"));
+                    }
+                    return;
+                }
+
+                // gradually remove old trail points for fading effect
                 if (!trailPoints.isEmpty()) {
                     trailPoints.remove(0);
                 }
@@ -128,7 +156,7 @@ public class GamePanel extends javax.swing.JPanel {
                 // Slice intersection check between previousPoint and currentPoint
                 if (testFruit != null && !testFruit.isCompleted()) {
                     if (testFruit.lineIntersectsFruit(previousPoint, currentPoint)) {
-                        
+
                         // use an older trail point for smoother swipe direction
                         Point cutStart;
 
@@ -216,6 +244,8 @@ public class GamePanel extends javax.swing.JPanel {
     }
 
     public void startGameLoop() {
+        // prevents timer from jumping after pause/resume
+        previousTickTime = System.currentTimeMillis();
         timer.start();
     }
 
@@ -228,6 +258,24 @@ public class GamePanel extends javax.swing.JPanel {
             trailPoints.clear();
         }
         previousPoint = null;
+
+        gameTimer.reset();
+
+        testFruit.reset(600, 450);
+        testFruit.subFruit = false;
+
+        activeObjects.clear();
+        activeObjects.add(testFruit);
+
         repaint();
+    }
+
+    public int getSecondsRemaining() {
+        return gameTimer.getSecondsRemaining();
+    }
+    
+    // register listener for when timer expires
+    public void setTimerExpiredListener(ActionListener listener) {
+        this.timerExpiredListener = listener;
     }
 }
