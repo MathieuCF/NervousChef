@@ -23,6 +23,7 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int PANEL_HEIGHT = 500;
     private static final int TICK_DELAY_MS = 16;
     private static final int MAX_TRAIL_POINTS = 20;
+    private static final long GAME_DURATION_MS = 30000; // temp num for testing only 30s
 
     private final Timer timer;
     private List<Point> trailPoints = new ArrayList<>();
@@ -55,7 +56,7 @@ public class GamePanel extends javax.swing.JPanel {
         activeObjects.add(testFruit);
 
         // create timer
-        gameTimer = new CountdownTimer(30000); // temp num for testing only 30s
+        gameTimer = new CountdownTimer(GAME_DURATION_MS); 
 
         timer = new Timer(TICK_DELAY_MS, new ActionListener() {
             @Override
