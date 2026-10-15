@@ -41,7 +41,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         gameScreen.setScore(0);
         // display initial timer value
-        gameScreen.setTimer(String.valueOf(gameScreen.getSecondsRemaining()));
+        gameScreen.setTimerSeconds(gameScreen.getSecondsRemaining());
         
         cardPanel.add(menuPanel, MENU);
         cardPanel.add(gameOverPanel, GAME_OVER);

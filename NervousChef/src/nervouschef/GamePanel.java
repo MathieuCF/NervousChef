@@ -15,6 +15,8 @@ import java.util.List;
 import javax.swing.Timer;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class GamePanel extends javax.swing.JPanel {
@@ -24,39 +26,40 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int TICK_DELAY_MS = 16;
     private static final int MAX_TRAIL_POINTS = 20;
     private static final long GAME_DURATION_MS = 30000; // temp num for testing only 30s
+    // used to generate diff fruit types without creating new random object each time
+    private final Random random = new Random(); 
+
+    // TEST ONLY: replace with throw mechanic later
+    private static final int FRUIT_START_X = 600;
+    private static final int FRUIT_START_Y = 450;
 
     private final Timer timer;
     private List<Point> trailPoints = new ArrayList<>();
     private List<FlyingObject> activeObjects = new ArrayList<>();
     private Point previousPoint;
-    private BufferedImage appleImage;
+    //enummap more efficient than hashmaps
+    private EnumMap<FruitType, BufferedImage> fruitImages;
     private CountdownTimer gameTimer;
     private long previousTickTime;
     private ActionListener timerExpiredListener;
 
-    // 1. Declare the test fruit field here at the top
-    private Fruit testFruit = new Fruit(600, 450, 25, this);
+    // Declare the current fruit field
+    private Fruit currentFruit;
 
     public GamePanel() {
-        try {
-            appleImage = ImageIO.read(
-                    getClass().getResource("apple 3d.png")
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
+        // initialise enummap
+        fruitImages = new EnumMap<>(FruitType.class);
 
+        for (FruitType type : FruitType.values()) {
+            fruitImages.put(type, loadImage(type.getImageFile()));
         }
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setBackground(Color.BLUE);
 
-        // 2. Add the test fruit to active objects inside the constructor
-        testFruit.subFruit = false;
-        testFruit.setXVelocity(-3.5);
-        testFruit.setYVelocity(-12);
-        activeObjects.add(testFruit);
+        launchRandomFruit();
 
         // create timer
-        gameTimer = new CountdownTimer(GAME_DURATION_MS); 
+        gameTimer = new CountdownTimer(GAME_DURATION_MS);
 
         timer = new Timer(TICK_DELAY_MS, new ActionListener() {
             @Override
@@ -74,7 +77,7 @@ public class GamePanel extends javax.swing.JPanel {
                 // stops game when timer reaches zero
                 if (gameTimer.isFinished()) {
                     stopGameLoop();
-                    
+
                     // notify MainFrame that timer expired
                     if (timerExpiredListener != null) {
                         timerExpiredListener.actionPerformed(
@@ -90,6 +93,7 @@ public class GamePanel extends javax.swing.JPanel {
 
                 // Update physics every frame safely using an Iterator
                 java.util.Iterator<FlyingObject> iterator = activeObjects.iterator();
+                boolean spawnNewFruit = false;
                 while (iterator.hasNext()) {
                     FlyingObject obj = iterator.next();
 
@@ -106,16 +110,22 @@ public class GamePanel extends javax.swing.JPanel {
                                     iterator.remove();
                                 } else {
                                     // Whole fruit fell off screen without being cut -> reset it
-                                    fruit.reset(600, 450);
+                                    iterator.remove();
+                                    spawnNewFruit = true;
                                 }
                             }
                         }
                     }
                 }
+                
+                // launch replacement fruit after iteration finishes(when done in while loop caused a lag
+                if(spawnNewFruit) {
+                    launchRandomFruit();
+                }
 
-                // If testFruit was sliced, check if its sub-fruits are all gone. 
+                // If currentFruit was sliced, check if its sub-fruits are all gone. 
                 // If they are gone, bring the test fruit back!
-                if (testFruit.isCompleted()) {
+                if (currentFruit.isCompleted()) {
                     boolean subFruitStillActive = false;
                     for (FlyingObject obj : activeObjects) {
                         if (obj instanceof Fruit && ((Fruit) obj).isSubFruit()) {
@@ -124,11 +134,10 @@ public class GamePanel extends javax.swing.JPanel {
                         }
                     }
 
-                    // If no sub-fruits are left on screen, respawn the whole test fruit
+                    // If no sub-fruits are left on screen, respawn the whole fruit
                     if (!subFruitStillActive) {
-                        testFruit.reset(600, 450);
-                        testFruit.subFruit = false; // Make sure it's a whole fruit again
-                        activeObjects.add(testFruit);
+                        
+                        launchRandomFruit();
                     }
                 }
 
@@ -155,8 +164,8 @@ public class GamePanel extends javax.swing.JPanel {
                 }
 
                 // Slice intersection check between previousPoint and currentPoint
-                if (testFruit != null && !testFruit.isCompleted()) {
-                    if (testFruit.lineIntersectsFruit(previousPoint, currentPoint)) {
+                if (currentFruit != null && !currentFruit.isCompleted()) {
+                    if (currentFruit.lineIntersectsFruit(previousPoint, currentPoint)) {
 
                         // use an older trail point for smoother swipe direction
                         Point cutStart;
@@ -180,7 +189,7 @@ public class GamePanel extends javax.swing.JPanel {
                         if (length >= 10) {
 
                             // slice using swipe direction and cut poistion
-                            testFruit.slice(
+                            currentFruit.slice(
                                     cutDir,
                                     previousPoint,
                                     0.5
@@ -231,7 +240,8 @@ public class GamePanel extends javax.swing.JPanel {
         // 2. Draw the test fruit / cube
         for (FlyingObject obj : activeObjects) {
             if (obj != null) {
-                obj.draw(g2, appleImage);
+                BufferedImage image = fruitImages.get(((Fruit) obj).getType());
+                obj.draw(g2, image);
             }
         }
     }
@@ -262,11 +272,9 @@ public class GamePanel extends javax.swing.JPanel {
 
         gameTimer.reset();
 
-        testFruit.reset(600, 450);
-        testFruit.subFruit = false;
-
         activeObjects.clear();
-        activeObjects.add(testFruit);
+        
+        launchRandomFruit();
 
         repaint();
     }
@@ -274,9 +282,48 @@ public class GamePanel extends javax.swing.JPanel {
     public int getSecondsRemaining() {
         return gameTimer.getSecondsRemaining();
     }
-    
+
     // register listener for when timer expires
     public void setTimerExpiredListener(ActionListener listener) {
         this.timerExpiredListener = listener;
     }
+
+    // loads an image and returns null if not found
+    private BufferedImage loadImage(String fileName) {
+        try {
+            java.net.URL url = getClass().getResource(fileName);
+
+            if (url != null) {
+                return ImageIO.read(url);
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to load " + fileName);
+        }
+        return null;
+    }
+
+    // returns a random fruit type
+    private FruitType getRandomFruitType() {
+        FruitType[] fruitTypes = FruitType.values();
+
+        // randomly pick an entry from the enum array
+        return fruitTypes[random.nextInt(fruitTypes.length)];
+    }
+
+    // creates and launches a random fruit
+    private void launchRandomFruit() {
+        FruitType randomType = getRandomFruitType();
+
+        currentFruit = new Fruit(FRUIT_START_X, FRUIT_START_Y, 
+                25, randomType, this);
+        
+        currentFruit.subFruit = false;
+        
+        // for test only purpose (should relace with throw mechanic)
+        currentFruit.setXVelocity(-3.5);
+        currentFruit.setYVelocity(-12);
+        
+        activeObjects.add(currentFruit);
+    }
+
 }

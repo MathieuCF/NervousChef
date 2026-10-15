@@ -30,10 +30,8 @@ public class GameScreen extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                setTimer(
-                        String.valueOf(
-                                gamePanel.getSecondsRemaining()
-                        )
+                setTimerSeconds(
+                        gamePanel.getSecondsRemaining()
                 );
             }
         });
@@ -68,9 +66,14 @@ public class GameScreen extends javax.swing.JPanel {
 
     }
 
-    //updates timer  displayed on screen
-    public void setTimer(String time) {
-        timerLabel.setText("Time: " + time);
+    //updates timer label using total remaining seconds 
+    public void setTimerSeconds(int seconds) {
+        int minutes = seconds / 60;
+        int secs = seconds % 60;
+        timerLabel.setText("Time: " + String.format( "%d:%02d" , minutes, secs
+    
+
+    ));
     }
 
     // registers listener when countdown reaches 0

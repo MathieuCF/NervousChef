@@ -13,7 +13,7 @@ public abstract class FlyingObject {
     public FlyingObject(double startX, double startY, double radius) {
         this.x = startX;
         this.y = startY;
-        this.radius = 25;
+        this.radius = 35;
     }
 
     // Full physics update (Arc trajectory)

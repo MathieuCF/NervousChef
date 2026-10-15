@@ -9,6 +9,7 @@ import java.awt.Polygon;
 
 public class Fruit extends FlyingObject {
 
+    private FruitType type;
     private GamePanel gamePanel; // Reference to the main game
     private boolean isSliced = false;
     public boolean subFruit = true;
@@ -21,10 +22,16 @@ public class Fruit extends FlyingObject {
     private double cutOffsetX;
     private double cutOffsetY;
 
-    public Fruit(double startX, double startY, double radius, GamePanel gamePanel) {
+    public Fruit(double startX, double startY, double radius, FruitType type ,GamePanel gamePanel) {
         super(startX, startY, radius);
         this.gamePanel = gamePanel;
+        this.type = type;
 
+    }
+    
+    // return this fruit's type
+    public FruitType getType() {
+        return type;
     }
 
     public void setCutData(
@@ -66,8 +73,8 @@ public class Fruit extends FlyingObject {
        //double absY2 = wholeFruit.y + wholeFruit.radius + offsetY2;
 
         // Creating fruit halves
-        Fruit half1 = new Fruit(wholeFruit.x, wholeFruit.y, wholeFruit.radius, gamePanel);
-        Fruit half2 = new Fruit(wholeFruit.x, wholeFruit.y, wholeFruit.radius, gamePanel);
+        Fruit half1 = new Fruit(wholeFruit.x, wholeFruit.y, wholeFruit.radius, wholeFruit.getType(), gamePanel);
+        Fruit half2 = new Fruit(wholeFruit.x, wholeFruit.y, wholeFruit.radius, wholeFruit.getType(), gamePanel);
 
         // Giving them separation velocities
         // 1. Determine how fast the cut was (magnitude of the normal vector)
