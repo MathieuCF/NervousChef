@@ -22,13 +22,13 @@ public class Fruit extends FlyingObject {
     private double cutOffsetX;
     private double cutOffsetY;
 
-    public Fruit(double startX, double startY, double radius, FruitType type ,GamePanel gamePanel) {
+    public Fruit(double startX, double startY, double radius, FruitType type, GamePanel gamePanel) {
         super(startX, startY, radius);
         this.gamePanel = gamePanel;
         this.type = type;
 
     }
-    
+
     // return this fruit's type
     public FruitType getType() {
         return type;
@@ -59,22 +59,13 @@ public class Fruit extends FlyingObject {
 
         Vector2D normalNormalized = normalToCut.normalize();
 
-        // Where are the centers of both halves, compared to the initial whole fruit center? (no longer needed)
-        //int offsetX1 = (int) (normalNormalized.x * (wholeFruit.getRadius() / 2.0));
-        //int offsetY1 = (int) (normalNormalized.y * (wholeFruit.getRadius() / 2.0));
-
-        //int offsetX2 = (int) (normalNormalized.x * (-wholeFruit.getRadius() / 2.0));
-        //int offsetY2 = (int) (normalNormalized.y * (-wholeFruit.getRadius() / 2.0));
-
-        //double absX1 = wholeFruit.x + wholeFruit.radius + offsetX1;
-        //double absY1 = wholeFruit.y + wholeFruit.radius + offsetY1;
-
-       // double absX2 = wholeFruit.x + wholeFruit.radius + offsetX2;
-       //double absY2 = wholeFruit.y + wholeFruit.radius + offsetY2;
-
         // Creating fruit halves
         Fruit half1 = new Fruit(wholeFruit.x, wholeFruit.y, wholeFruit.radius, wholeFruit.getType(), gamePanel);
         Fruit half2 = new Fruit(wholeFruit.x, wholeFruit.y, wholeFruit.radius, wholeFruit.getType(), gamePanel);
+
+        // copy the current angle so the fruit does not jump when sliced
+        half1.setRotation(wholeFruit.getRotation());
+        half2.setRotation(wholeFruit.getRotation());
 
         // Giving them separation velocities
         // 1. Determine how fast the cut was (magnitude of the normal vector)
@@ -90,12 +81,52 @@ public class Fruit extends FlyingObject {
         half2.setXVelocity(wholeFruit.getVx() - (Math.signum(normalToCut.x) * cutSpeedX));
         half2.setYVelocity(wholeFruit.getVy() - (Math.signum(normalToCut.y) * cutSpeedY));
 
-        // calculates actual position of mouse relative to fruit
-        double cutOffsetX = cutPoint.x - wholeFruit.getX();
-        double cutOffsetY = cutPoint.y - wholeFruit.getY();
+        // Convert cut information from screen coordinates into the fruit's local coordinate system
+        //so the cut stays aligned with the swipe after rotation.
+        double angle = -wholeFruit.getRotation();
 
-        half1.setCutData(normalNormalized, true, cutOffsetX, cutOffsetY);
-        half2.setCutData(normalNormalized, false, cutOffsetX, cutOffsetY);
+        double cos = Math.cos(angle);
+        double sin = Math.sin(angle);
+
+        // rotate cut normal into fruit space using standard 2d rotation formula x' = xcos - ysin
+        Vector2D localNormal
+                = new Vector2D(
+                        normalNormalized.x * cos
+                        - normalNormalized.y * sin,
+                        normalNormalized.x * sin
+                        + normalNormalized.y * cos
+                );
+
+        // fruit centre (rotation point)
+        double centreX = wholeFruit.getX() + wholeFruit.getRadius();
+        double centreY = wholeFruit.getY() + wholeFruit.getRadius();
+
+        // cut point relative to centre
+        double relativeX
+                = cutPoint.x - centreX;
+
+        double relativeY
+                = cutPoint.y - centreY;
+
+        //rotate cut point into fruit space
+        double rotatedX
+                = relativeX * cos
+                - relativeY * sin;
+
+        double rotatedY
+                = relativeX * sin
+                + relativeY * cos;
+
+        // Convert back to top-left based coordinates
+        double localCutOffsetX = rotatedX + wholeFruit.getRadius();
+        double localCutOffsetY = rotatedY +  wholeFruit.getRadius();
+
+        double spinSpeed = 0.15;
+        half1.setRotationSpeed(spinSpeed);
+        half2.setRotationSpeed(-spinSpeed);
+
+        half1.setCutData(localNormal, true, localCutOffsetX, localCutOffsetY);
+        half2.setCutData(localNormal, false, localCutOffsetX, localCutOffsetY);
 
         gamePanel.unspawnObject(wholeFruit);
         gamePanel.spawnObject(half1);
@@ -124,9 +155,7 @@ public class Fruit extends FlyingObject {
         return (Vector2D.shortestDistanceToSegment(A, B, fruitCenter) <= radius);  // Mouse passed through fruit hitbox
     }
 
-    @Override
-    public void draw(Graphics2D g2, BufferedImage fruitImage) {
-
+    private void drawImage(Graphics2D g2, BufferedImage fruitImage) {
         // Draw the square representing the fruit using its x, y, and radius (diameter = radius * 2)
         int size = (int) (getRadius() * 2);
 
@@ -211,8 +240,22 @@ public class Fruit extends FlyingObject {
                 null
         );
 
-        // restores og clipping region
+        // restores og clipping region 
         g2.setClip(oldClip);
+
+    }
+
+    @Override
+    public void draw(Graphics2D g2, BufferedImage fruitImage) {
+
+        java.awt.geom.AffineTransform oldTransform = g2.getTransform();
+
+        g2.rotate(getRotation(), x + radius, y + radius);
+
+        drawImage(g2, fruitImage);
+
+        // restore transform so the rotation doesnt leak
+        g2.setTransform(oldTransform);
 
     }
 }

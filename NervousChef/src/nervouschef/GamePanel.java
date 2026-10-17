@@ -18,16 +18,20 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Random;
 import javax.imageio.ImageIO;
+import java.awt.Paint;
+import java.awt.GradientPaint;
+import java.awt.geom.Path2D;
+import java.util.Iterator;
 
 public class GamePanel extends javax.swing.JPanel {
 
     private static final int PANEL_WIDTH = 800;
     private static final int PANEL_HEIGHT = 500;
     private static final int TICK_DELAY_MS = 16;
-    private static final int MAX_TRAIL_POINTS = 20;
+    private static final int MAX_TRAIL_POINTS = 35;
     private static final long GAME_DURATION_MS = 30000; // temp num for testing only 30s
     // used to generate diff fruit types without creating new random object each time
-    private final Random random = new Random(); 
+    private final Random random = new Random();
 
     // TEST ONLY: replace with throw mechanic later
     private static final int FRUIT_START_X = 600;
@@ -43,6 +47,24 @@ public class GamePanel extends javax.swing.JPanel {
     private long previousTickTime;
     private ActionListener timerExpiredListener;
 
+    private static final float TRAIL_MIN_WIDTH = 1f;
+    private static final float TRAIL_MAX_WIDTH = 10f;
+
+    private static final int TRAIL_MIN_ALPHA = 0;
+    private static final int TRAIL_MAX_ALPHA = 180;
+
+    private final List<Particle> particles = new ArrayList<>();
+    private static final int JUICE_COUNT = 15;
+
+    private static final double JUICE_MIN_SPEED = 2;
+    private static final double JUICE_MAX_SPEED = 7;
+
+    private static final int JUICE_MIN_LIFE = 25;
+    private static final int JUICE_MAX_LIFE = 45;
+
+    private static final double JUICE_MIN_SIZE = 4;
+    private static final double JUICE_MAX_SIZE = 8;
+
     // Declare the current fruit field
     private Fruit currentFruit;
 
@@ -51,7 +73,7 @@ public class GamePanel extends javax.swing.JPanel {
         fruitImages = new EnumMap<>(FruitType.class);
 
         for (FruitType type : FruitType.values()) {
-            fruitImages.put(type, loadImage(type.getImageFile()));
+            fruitImages.put(type, ImageLoader.load(type.getImageFile()));
         }
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
         setBackground(Color.BLUE);
@@ -92,8 +114,9 @@ public class GamePanel extends javax.swing.JPanel {
                 }
 
                 // Update physics every frame safely using an Iterator
-                java.util.Iterator<FlyingObject> iterator = activeObjects.iterator();
+                Iterator<FlyingObject> iterator = activeObjects.iterator();
                 boolean spawnNewFruit = false;
+
                 while (iterator.hasNext()) {
                     FlyingObject obj = iterator.next();
 
@@ -117,9 +140,22 @@ public class GamePanel extends javax.swing.JPanel {
                         }
                     }
                 }
-                
+
+                Iterator<Particle> particleIterator = particles.iterator();
+                while (particleIterator.hasNext()) {
+
+                    Particle particle
+                            = particleIterator.next();
+
+                    particle.update();
+
+                    if (particle.isDead()) {
+                        particleIterator.remove();
+                    }
+                }
+
                 // launch replacement fruit after iteration finishes(when done in while loop caused a lag
-                if(spawnNewFruit) {
+                if (spawnNewFruit) {
                     launchRandomFruit();
                 }
 
@@ -136,7 +172,7 @@ public class GamePanel extends javax.swing.JPanel {
 
                     // If no sub-fruits are left on screen, respawn the whole fruit
                     if (!subFruitStillActive) {
-                        
+
                         launchRandomFruit();
                     }
                 }
@@ -194,6 +230,8 @@ public class GamePanel extends javax.swing.JPanel {
                                     previousPoint,
                                     0.5
                             );
+
+                            spawnJuice(currentPoint, currentFruit.getType().getJuiceColor());
                         }
                     }
                 }
@@ -229,13 +267,8 @@ public class GamePanel extends javax.swing.JPanel {
                 RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        // 1. Draw the slicing trail
-        g2.setColor(Color.WHITE);
-        for (int i = 0; i < trailPoints.size() - 1; i++) {
-            Point p1 = trailPoints.get(i);
-            Point p2 = trailPoints.get(i + 1);
-            g2.drawLine(p1.x, p1.y, p2.x, p2.y);
-        }
+        // 1. draw the trail
+        drawTrail(g2);
 
         // 2. Draw the test fruit / cube
         for (FlyingObject obj : activeObjects) {
@@ -244,6 +277,140 @@ public class GamePanel extends javax.swing.JPanel {
                 obj.draw(g2, image);
             }
         }
+
+        // draw particles/splatter
+        drawParticles(g2);
+    }
+
+    private void drawTrail(Graphics2D g2) {
+
+        // Need at least 2 points to form a trail
+        if (trailPoints.size() < 2) {
+            return;
+        }
+
+        // Stores the left and right edges of the blade
+        List<Point> leftPoints = new ArrayList<>();
+        List<Point> rightPoints = new ArrayList<>();
+
+        // Reuse the previous normal if a direction collapses to (0,0)
+        Vector2D lastValidNormal = new Vector2D(0, 1);
+
+        for (int i = 0; i < trailPoints.size(); i++) {
+
+            Point point = trailPoints.get(i);
+
+            Vector2D direction;
+
+            // First point uses p1 - p0
+            if (i == 0) {
+
+                direction = Vector2D.between(
+                        trailPoints.get(0),
+                        trailPoints.get(1)
+                ).normalize();
+
+            } // Last point uses p[n-1] - p[n-2]
+            else if (i == trailPoints.size() - 1) {
+
+                direction = Vector2D.between(
+                        trailPoints.get(i - 1),
+                        trailPoints.get(i)
+                ).normalize();
+
+            } // Middle points use p[i+1] - p[i-1]
+            else {
+
+                direction = Vector2D.between(
+                        trailPoints.get(i - 1),
+                        trailPoints.get(i + 1)
+                ).normalize();
+            }
+
+            // Calculate perpendicular vector
+            Vector2D normal
+                    = new Vector2D(
+                            -direction.y,
+                            direction.x
+                    );
+
+            // Reuse previous normal if direction is zero length
+            if (normal.x == 0 && normal.y == 0) {
+                normal = lastValidNormal;
+            } else {
+                lastValidNormal = normal;
+            }
+
+            // Position along trail (0 = tail, 1 = head)
+            double progress
+                    = (double) i
+                    / (trailPoints.size() - 1);
+
+            // Width increases towards the head
+            double width
+                    = TRAIL_MIN_WIDTH
+                    + progress
+                    * (TRAIL_MAX_WIDTH - TRAIL_MIN_WIDTH);
+
+            double halfWidth = width / 2.0;
+
+            // Left edge point
+            int leftX = (int) (point.x
+                    + normal.x * halfWidth);
+
+            int leftY = (int) (point.y
+                    + normal.y * halfWidth);
+
+            // Right edge point
+            int rightX = (int) (point.x
+                    - normal.x * halfWidth);
+
+            int rightY = (int) (point.y
+                    - normal.y * halfWidth);
+
+            leftPoints.add(
+                    new Point(leftX, leftY)
+            );
+
+            rightPoints.add(
+                    new Point(rightX, rightY)
+            );
+        }
+
+        // create blade shape
+        Path2D.Double blade = new Path2D.Double();
+
+        // start at first left point
+        blade.moveTo(leftPoints.get(0).x, leftPoints.get(0).y);
+
+        // follow left edge
+        for (Point p : leftPoints) {
+            blade.lineTo(p.x, p.y);
+
+        }
+
+        //follow right edge backwards 
+        for (int i = rightPoints.size() - 1; i >= 0; i--) {
+            Point p = rightPoints.get(i);
+
+            blade.lineTo(p.x, p.y);
+        }
+
+        blade.closePath();
+        Paint oldPaint = g2.getPaint();
+
+        Point tail = trailPoints.get(0);
+        Point head = trailPoints.get(trailPoints.size() - 1);
+
+        GradientPaint gradient = new GradientPaint(tail.x, tail.y,
+                new Color(255, 255, 255, TRAIL_MIN_ALPHA), head.x, head.y,
+                new Color(255, 255, 255, TRAIL_MAX_ALPHA));
+
+        g2.setPaint(gradient);
+        g2.fill(blade);
+
+        g2.setPaint(oldPaint);
+
     }
 
     public void spawnObject(FlyingObject obj) {
@@ -273,7 +440,9 @@ public class GamePanel extends javax.swing.JPanel {
         gameTimer.reset();
 
         activeObjects.clear();
-        
+
+        particles.clear();
+
         launchRandomFruit();
 
         repaint();
@@ -287,20 +456,7 @@ public class GamePanel extends javax.swing.JPanel {
     public void setTimerExpiredListener(ActionListener listener) {
         this.timerExpiredListener = listener;
     }
-
-    // loads an image and returns null if not found
-    private BufferedImage loadImage(String fileName) {
-        try {
-            java.net.URL url = getClass().getResource(fileName);
-
-            if (url != null) {
-                return ImageIO.read(url);
-            }
-        } catch (IOException e) {
-            System.out.println("Failed to load " + fileName);
-        }
-        return null;
-    }
+  
 
     // returns a random fruit type
     private FruitType getRandomFruitType() {
@@ -314,16 +470,44 @@ public class GamePanel extends javax.swing.JPanel {
     private void launchRandomFruit() {
         FruitType randomType = getRandomFruitType();
 
-        currentFruit = new Fruit(FRUIT_START_X, FRUIT_START_Y, 
+        currentFruit = new Fruit(FRUIT_START_X, FRUIT_START_Y,
                 25, randomType, this);
-        
+
         currentFruit.subFruit = false;
-        
+
         // for test only purpose (should relace with throw mechanic)
         currentFruit.setXVelocity(-3.5);
         currentFruit.setYVelocity(-12);
-        
+
+        // random clockwise or anticlockwise spinning
+        double spinSpeed = random.nextBoolean() ? 0.05 : -0.05;
+
+        currentFruit.setRotationSpeed(spinSpeed);
         activeObjects.add(currentFruit);
     }
 
+    private void spawnJuice(Point position, Color color) {
+        for (int i = 0; i < JUICE_COUNT; i++) {
+            double angle = random.nextDouble() * Math.PI * 2;
+
+            double speed = JUICE_MIN_SPEED + random.nextDouble() * (JUICE_MAX_SPEED - JUICE_MIN_SPEED);
+
+            double vx = Math.cos(angle) * speed;
+            double vy = Math.sin(angle) * speed;
+
+            int life = JUICE_MIN_LIFE + random.nextInt(JUICE_MAX_LIFE - JUICE_MIN_LIFE + 1);
+
+            double size = JUICE_MIN_SIZE + random.nextDouble() * (JUICE_MAX_SIZE - JUICE_MIN_SIZE);
+
+            particles.add(new Particle(position.x, position.y, vx, vy, life, size, color));
+
+        }
+    }
+
+    // draw juice splash particles over fruit
+    private void drawParticles(Graphics2D g2) {
+        for (Particle particle : particles) {
+            particle.draw(g2);
+        }
+    }
 }

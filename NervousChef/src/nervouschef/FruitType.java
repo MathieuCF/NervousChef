@@ -4,27 +4,32 @@
  */
 package nervouschef;
 
+import java.awt.Color;
+
 /**
  *
  * @author lailx
  */
 public enum FruitType {
+    
     // what image goes with what fruit 
     //and num of slices each fruit needs
-    APPLE("apple.png", 1),
-    ORANGE("orange.png", 2),
-    WATERMELON("watermelon.png", 3),
-    COCONUT("coconut.png", 1),
-    LEMONS("lemon.png", 2),
-    PEACHES("peach.png", 3),
-    KIWI("kiwi.png", 1);
+    APPLE("apple.png", 1, Color.RED),
+    ORANGE("orange.png", 2, Color.ORANGE),
+    WATERMELON("watermelon.png", 3, Color.RED),
+    COCONUT("coconut.png", 1, Color.WHITE),
+    LEMONS("lemon.png", 2, Color.YELLOW),
+    PEACHES("peach.png", 3, Color.PINK),
+    KIWI("kiwi.png", 1, Color.GREEN);
     
     private final String imageFile;
-    private final int slicesRequired;
+    private final int slicesRequired; 
+    private final Color juiceColor;
     
-    FruitType(String imageFile, int slicesRequired) {
+    FruitType(String imageFile, int slicesRequired, Color juiceColor) {
         this.imageFile = imageFile;
         this.slicesRequired = slicesRequired;
+        this.juiceColor = juiceColor;
     }
     
     public String getImageFile() {
@@ -33,5 +38,9 @@ public enum FruitType {
     
     public int getSlicesRequired() {
         return slicesRequired;
+    }
+    
+    public Color getJuiceColor() {
+        return juiceColor;
     }
 }

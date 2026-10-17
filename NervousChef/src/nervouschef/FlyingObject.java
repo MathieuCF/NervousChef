@@ -9,7 +9,9 @@ public abstract class FlyingObject {
     protected double vx; // Horizontal velocity (moves left/right)
     protected double vy; // Vertical velocity (gravity / up/down)
     protected double radius = 25; // Default size/radius
-
+    protected double rotation; // current rotation angle in radians
+    protected double rotationSpeed; // how much a rotation changes each update
+    
     public FlyingObject(double startX, double startY, double radius) {
         this.x = startX;
         this.y = startY;
@@ -22,6 +24,7 @@ public abstract class FlyingObject {
         vy += gravity; // Pulls down over time
         x += vx;       // Moves horizontally
         y += vy;       // Moves vertically
+        rotation += rotationSpeed; 
     }
 
     // Reset method for re-launching the test object
@@ -30,6 +33,9 @@ public abstract class FlyingObject {
         this.y = startY;
         this.vx = -3.5;
         this.vy = -12.0;
+        this.rotation = 0;
+        this.rotationSpeed = 0;
+        
     }
     
     public void setXVelocity(double vx) {
@@ -39,6 +45,14 @@ public abstract class FlyingObject {
     public void setYVelocity(double vy) {
         this.vy = vy;
     }
+    
+    public void setRotationSpeed(double rotationSpeed) {
+        this.rotationSpeed = rotationSpeed;
+    }
+    
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
 
 
     // Getters
@@ -47,6 +61,8 @@ public abstract class FlyingObject {
     public double getVx() { return vx; }
     public double getVy() { return vy; }
     public double getRadius() { return radius; }
+    public double getRotation() { return rotation; }
+      
 
     // Abstract methods that subclasses (like Fruit) must implement
     public abstract boolean isCompleted();
