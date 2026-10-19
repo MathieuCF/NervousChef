@@ -17,9 +17,9 @@ public class Fruit extends FlyingObject {
     private boolean isSliced = false;
     public boolean subFruit = true;
     private double minXSepVel = 2.0;
-    private double maxXSepVel = 12.0;
+    private double maxXSepVel = 5.0;
     private double minYSepVel = 2.0;
-    private double maxYSepVel = 12.0;
+    private double maxYSepVel = 5.0;
     private Vector2D cutNormal;
     private boolean firstHalf;
     private double cutOffsetX;

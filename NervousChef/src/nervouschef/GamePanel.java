@@ -201,7 +201,14 @@ public class GamePanel extends javax.swing.JPanel {
 
                 // Slice intersection check between previousPoint and currentPoint
                 if (currentFruit != null && !currentFruit.isCompleted()) {
-                    if (currentFruit.lineIntersectsFruit(previousPoint, currentPoint)) {
+
+                    boolean touching = currentFruit.lineIntersectsFruit(previousPoint, currentPoint);
+
+                    if (!touching) {
+                        // swipe left the fruit, so the next entry counts as a new hit
+                        currentFruit.setTouched(false);
+
+                    } else if (!currentFruit.isTouched()) {
 
                         // use an older trail point for smoother swipe direction
                         Point cutStart;
@@ -213,25 +220,20 @@ public class GamePanel extends javax.swing.JPanel {
                         }
 
                         // calculate swipe direction
-                        Vector2D cutDir
-                                = Vector2D.between(cutStart, currentPoint);
-
-                        // calculate swipe length
-                        double length = Math.sqrt(
-                                cutDir.x * cutDir.x
-                                + cutDir.y * cutDir.y);
+                        Vector2D cutDir = Vector2D.between(cutStart, currentPoint);
 
                         // ignore short swipes
-                        if (length >= 10) {
+                        if (cutDir.getMagnitude() >= 10) {
 
-                            // slice using swipe direction and cut poistion
-                            currentFruit.slice(
-                                    cutDir,
-                                    previousPoint,
-                                    0.5
-                            );
+                            // mark as touched so this same swipe can't hit again
+                            currentFruit.setTouched(true);
 
                             spawnJuice(currentPoint, currentFruit.getType().getJuiceColor());
+
+                            // takeHit() returns true only on the final hit
+                            if (currentFruit.takeHit()) {
+                                currentFruit.slice(cutDir, previousPoint, 0.5);
+                            }
                         }
                     }
                 }
@@ -474,6 +476,8 @@ public class GamePanel extends javax.swing.JPanel {
                 25, randomType, this);
 
         currentFruit.subFruit = false;
+        int hits = randomType.getSlicesRequired();
+        currentFruit.setGravity(0.4 - 0.05 * (hits - 1));  // 0.4 grav at 1 hit, 0.35 at 2, and 0.3 at 3
 
         // for test only purpose (should relace with throw mechanic)
         currentFruit.setXVelocity(-3.5);
