@@ -6,6 +6,9 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.Shape;
 import java.awt.Polygon;
+import java.awt.RadialGradientPaint;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 public class Fruit extends FlyingObject {
 
@@ -21,11 +24,17 @@ public class Fruit extends FlyingObject {
     private boolean firstHalf;
     private double cutOffsetX;
     private double cutOffsetY;
+    private int hitsTotal;
+    private int hitsRemaining;
+    private boolean touched;      // is swipe currently inside this fruit
+    private int hitFlashFrames;
 
     public Fruit(double startX, double startY, double radius, FruitType type, GamePanel gamePanel) {
         super(startX, startY, radius);
         this.gamePanel = gamePanel;
         this.type = type;
+        this.hitsTotal = type.getSlicesRequired();
+        this.hitsRemaining = hitsTotal;
 
     }
 
@@ -51,6 +60,31 @@ public class Fruit extends FlyingObject {
 
     public boolean isSubFruit() {
         return subFruit;
+    }
+    
+    // returns true if this hit was the final one
+    public boolean takeHit() {
+        hitsRemaining--;
+        if (hitsRemaining <= 0) return true;
+        hitFlashFrames = 8;
+        vy = Math.max(Math.min(vy, 0) - 3, -9); // small cut velocity bump
+        return false;
+    }
+    
+    private void drawGlow(Graphics2D g2) {
+        if (subFruit || hitsRemaining <= 1) return;
+        double glowSpeed = 120.0;  // higher means slower pulse, lower is faster pulse
+        double pulse = 0.9 + 0.1 * Math.sin(System.currentTimeMillis() / glowSpeed);  // pulsating glow value between 0.8-1.0
+        float glowR = (float) (radius * 1.7 * pulse);  // shrinking and growing glow
+        
+        Color c = hitsRemaining >= 3 ? new Color(255, 70, 70) : new Color(255, 210, 60);
+        if (hitFlashFrames > 0) c = Color.WHITE;
+        
+        g2.setPaint(new RadialGradientPaint(
+            new Point2D.Double(cx, cy), glowR,
+            new float[]{0f, 0.6f, 1f},
+            new Color[]{withAlpha(c, 220), withAlpha(c, 110), withAlpha(c, 0)}));
+        g2.fillOval((int) (cx - glowR), (int) (cy - glowR), (int) (glowR * 2), (int) (glowR * 2));
     }
 
     public void createHalves(Fruit wholeFruit, Vector2D cutVector, Point cutPoint, double sizeMultiplier) {
@@ -154,7 +188,30 @@ public class Fruit extends FlyingObject {
 
         return (Vector2D.shortestDistanceToSegment(A, B, fruitCenter) <= radius);  // Mouse passed through fruit hitbox
     }
+    
+    // basic getters instead of using object field
+    public boolean isTouched() { return touched; }
+    public void setTouched(boolean touched) { this.touched = touched; }
+    public int getHitsTotal() { return hitsTotal; }
 
+    
+    @Override
+    public void update() {
+        super.update();
+        if (hitFlashFrames > 0) hitFlashFrames--;
+
+        // bounce off side walls while still a whole multi-hit fruit
+        if (!subFruit && hitsTotal > 1) {
+            double w = gamePanel.getWidth();
+            if (x < 0) { x = 0; vx = Math.abs(vx); }  // easy revert directions math
+            else if (w > 0 && x + radius * 2 > w) { x = w - radius * 2; vx = -Math.abs(vx); }
+        }
+    }
+    
+    private static Color withAlpha(Color c, int a) {
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);  // determine color based on a
+    }
+    
     private void drawImage(Graphics2D g2, BufferedImage fruitImage) {
         // Draw the square representing the fruit using its x, y, and radius (diameter = radius * 2)
         int size = (int) (getRadius() * 2);
@@ -247,15 +304,11 @@ public class Fruit extends FlyingObject {
 
     @Override
     public void draw(Graphics2D g2, BufferedImage fruitImage) {
+        drawGlow(g2);
 
-        java.awt.geom.AffineTransform oldTransform = g2.getTransform();
-
+        AffineTransform oldTransform = g2.getTransform();
         g2.rotate(getRotation(), x + radius, y + radius);
-
         drawImage(g2, fruitImage);
-
-        // restore transform so the rotation doesnt leak
         g2.setTransform(oldTransform);
-
     }
 }

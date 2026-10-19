@@ -6,9 +6,12 @@ import java.awt.image.BufferedImage;
 public abstract class FlyingObject {
     protected double x;
     protected double y;
+    protected double cx;
+    protected double cy;
     protected double vx; // Horizontal velocity (moves left/right)
     protected double vy; // Vertical velocity (gravity / up/down)
     protected double radius = 25; // Default size/radius
+    protected double gravity = 0.4;
     protected double rotation; // current rotation angle in radians
     protected double rotationSpeed; // how much a rotation changes each update
     
@@ -16,11 +19,12 @@ public abstract class FlyingObject {
         this.x = startX;
         this.y = startY;
         this.radius = 35;
+        this.cx = x + radius;
+        this.cy = y + radius;
     }
 
     // Full physics update (Arc trajectory)
     public void update() {
-        double gravity = 0.4;
         vy += gravity; // Pulls down over time
         x += vx;       // Moves horizontally
         y += vy;       // Moves vertically
@@ -37,6 +41,8 @@ public abstract class FlyingObject {
         this.rotationSpeed = 0;
         
     }
+    
+    public void setGravity(double gravity) { this.gravity = gravity; }
     
     public void setXVelocity(double vx) {
         this.vx = vx;
