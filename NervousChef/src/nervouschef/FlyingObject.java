@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 public abstract class FlyingObject {
-
     protected double x;
     protected double y;
     protected double cx;
@@ -33,7 +32,7 @@ public abstract class FlyingObject {
         y += vy;       // Moves vertically
         cx = x + radius;
         cy = y + radius;
-        rotation += rotationSpeed; 
+        rotation += rotationSpeed;
     }
 
     // Reset method for re-launching the object
@@ -68,32 +67,15 @@ public abstract class FlyingObject {
     }
 
     // Getters
-    public double getX() {
-        return x;
-    }
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public double getVx() { return vx; }
+    public double getVy() { return vy; }
+    public double getRadius() { return radius; }
+    public double getRotation() { return rotation; }
 
-    public double getY() {
-        return y;
-    }
-
-    public double getVx() {
-        return vx;
-    }
-
-    public double getVy() {
-        return vy;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public double getRotation() {
-        return rotation;
-    }
 
     // Abstract methods that subclasses (like Fruit) must implement
     public abstract boolean isCompleted();
-
     public abstract void draw(Graphics2D g2, BufferedImage appleImage);
 }
