@@ -46,17 +46,6 @@ public class GamePanel extends javax.swing.JPanel {
     private static final String[] GREAT_WORDS = {"Scrumptious!", "Berry Good!", "Juicetastic!", "Zest-acular!"};
     private static final String[] PERFECT_WORDS = {"Pearfect!!", "Mango-nificent!!", "Suck-culent!!", "Tropical Bliss!!", "Fruit-iculous!!"};  // very creative i know
 
-    private final List<FloatingText> floatingTexts = new ArrayList<>();
-
-    private static final Font POINTS_FONT = new Font("Segoe UI", Font.BOLD, 22);
-    private static final Font WORD_FONT = new Font("Segoe UI", Font.BOLD, 32);
-
-    // fun part, making fruit inspired words ;)
-    private static final String[] OK_WORDS = {"Sweet", "Fruity", "Yummy", "Tasty"};
-    private static final String[] GOOD_WORDS = {"Juicy", "Delicious", "Splendid", "Peachy"};
-    private static final String[] GREAT_WORDS = {"Scrumptious!", "Berry Good!", "Juicetastic!", "Zest-acular!"};
-    private static final String[] PERFECT_WORDS = {"Pearfect!!", "Mango-nificent!!", "Suck-culent!!", "Tropical Bliss!!", "Fruit-iculous!!"};  // very creative i know
-
     // constants for launchRandomFruit
     private static final int LAUNCH_Y = PANEL_HEIGHT;
     private static final int LAUNCH_MARGIN = 40;
@@ -547,39 +536,6 @@ public class GamePanel extends javax.swing.JPanel {
         floatingTexts.add(new FloatingText(text, x, y, life, font, color));
     }
 
-    private String pickPraise(double accuracy) {
-        String[] pool;
-        if (accuracy >= 0.9) {
-            pool = PERFECT_WORDS;
-        } else if (accuracy >= 0.75) {
-            pool = GREAT_WORDS;
-        } else if (accuracy >= 0.5) {
-            pool = GOOD_WORDS;
-        } else {
-            pool = OK_WORDS;
-        }
-
-        return pool[random.nextInt(pool.length)];  // pick random from list
-    }
-
-    private Color praiseColor(double accuracy) {
-        if (accuracy >= 0.9) {
-            return new Color(255, 120, 200);  // hot pink
-        }
-        if (accuracy >= 0.75) {
-            return new Color(255, 200, 40);   // mango yellow
-        }
-        if (accuracy >= 0.4) {
-            return new Color(120, 230, 120);  // lime
-        }
-        return Color.WHITE;
-    }
-
-    private void spawnFloatingText(String text, double x, double y, Font font, Color color, int life) {
-        floatingTexts.add(new FloatingText(text, x, y, life, font, color));
-    }
-
-
     public int getSecondsRemaining() {
         return gameTimer.getSecondsRemaining();
     }
@@ -610,7 +566,7 @@ public class GamePanel extends javax.swing.JPanel {
         double startX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - FRUIT_SIZE - LAUNCH_MARGIN);
         double startY = LAUNCH_Y;
 
-        currentFruit.subFruit = false;
+        currentFruit = new Fruit(startX, startY, 35, randomType, this);
         int hits = randomType.getSlicesRequired();
         currentFruit.setGravity(0.4 - 0.05 * (hits - 1));  // 0.4 grav at 1 hit, 0.35 at 2, and 0.3 at 3
 
@@ -664,18 +620,6 @@ public class GamePanel extends javax.swing.JPanel {
     }
 
     public int getScore() {
-        return score;
-    }
-
-    private void addScore(int points) {
-        score += points;
-        if (scoreListener != null) {
-            scoreListener.actionPerformed(
-                    new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "SCORE"));
-        }
-    }
-
-    public int getScore(){
         return score;
     }
 
