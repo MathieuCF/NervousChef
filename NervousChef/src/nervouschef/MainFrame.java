@@ -13,19 +13,19 @@ import java.awt.event.ActionListener;
  * @author lailx
  */
 public class MainFrame extends javax.swing.JFrame {
-    
+
     private MenuPanel menuPanel;
     private GameOverPanel gameOverPanel;
     private GameScreen gameScreen;
     private PausePanel pausePanel;
-    
+
     private java.awt.CardLayout cardLayout;
-    
+
     private static final String MENU = "MENU";
     private static final String GAME_OVER = "GAME_OVER";
     private static final String GAME = "GAME";
     private static final String PAUSE = "PAUSE";
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
 
     /**
@@ -38,16 +38,16 @@ public class MainFrame extends javax.swing.JFrame {
         gameScreen = new GameScreen();
         pausePanel = new PausePanel();
         cardLayout = (java.awt.CardLayout) cardPanel.getLayout();
-        
+
         gameScreen.setScore(0);
         // display initial timer value
         gameScreen.setTimerSeconds(gameScreen.getSecondsRemaining());
-        
+
         cardPanel.add(new BackgroundPanel("background.jpeg", menuPanel), MENU);
-        cardPanel.add(new BackgroundPanel("background_1.jpeg",gameOverPanel), GAME_OVER);
+        cardPanel.add(new BackgroundPanel("background_1.jpeg", gameOverPanel), GAME_OVER);
         cardPanel.add(gameScreen, GAME);
-        cardPanel.add(new BackgroundPanel("game_background.jpeg",pausePanel), PAUSE);
-        
+        cardPanel.add(new BackgroundPanel("game_background.jpeg", pausePanel), PAUSE);
+
         //handles start button by switching from menu screen to game screen
         menuPanel.setStartListener(new ActionListener() {
             @Override
@@ -55,8 +55,7 @@ public class MainFrame extends javax.swing.JFrame {
                 showGame();
             }
         });
-        
-        
+
         //handles the restart button by resetting and restarting the game.
         gameOverPanel.setRestartListener(new ActionListener() {
             @Override
@@ -65,7 +64,7 @@ public class MainFrame extends javax.swing.JFrame {
                 showGame();
             }
         });
-        
+
         //handles the exit button
         gameOverPanel.setExitListener(new ActionListener() {
             @Override
@@ -74,42 +73,41 @@ public class MainFrame extends javax.swing.JFrame {
                 //closes app
             }
         });
-        
+
         // handles resume button and returns to current game
         pausePanel.setResumeListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               showGame(); 
+                showGame();
             }
         });
-        
+
         //handles the restart button by resetting and restarting the game.
         pausePanel.setRestartListener(new ActionListener() {
-             @Override
+            @Override
             public void actionPerformed(ActionEvent e) {
-               gameScreen.reset();
-               showGame();
+                gameScreen.reset();
+                showGame();
             }
         });
-        
+
         //handles the pause button 
         gameScreen.setPauseListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               showPause(); // replace with atctual score
+                showPause(); // replace with atctual score
                 //when the game is paused, end current session goes to gameoverpanel/screen
             }
         });
-        
+
         // handles game timer reaching 0
-        gameScreen.setTimerExpiredListener(new ActionListener(){
+        gameScreen.setTimerExpiredListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showGameOver(0); // replace with actual score later
             }
         });
-        
-        
+
         //displays main menue when game starts
         showMenu();
         //showGame();
@@ -117,34 +115,34 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
         //places window in center of screen
         setLocationRelativeTo(null);
-        
+
     }
-    
+
     //displays main menu and stops game loop
     public void showMenu() {
         gameScreen.stopGameLoop();
         cardLayout.show(cardPanel, MENU);
-        
+
     }
-    
+
     //displays game over screen, stops the current session and displays the final score
     public void showGameOver(int score) {
         gameScreen.stopGameLoop();
         gameOverPanel.setScore(score);
         cardLayout.show(cardPanel, GAME_OVER);
     }
-    
+
     // switched to game screen and starts game loop
     public void showGame() {
         gameScreen.startGameLoop();
         cardLayout.show(cardPanel, GAME);
     }
+
     //disp pause screen, pauses current session and displays both buttons
     public void showPause() {
         gameScreen.stopGameLoop();
         cardLayout.show(cardPanel, PAUSE);
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.

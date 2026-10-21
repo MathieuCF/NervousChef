@@ -4,15 +4,19 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 public abstract class FlyingObject {
+
     protected double x;
     protected double y;
+    protected double cx;
+    protected double cy;
     protected double vx; // Horizontal velocity (moves left/right)
     protected double vy; // Vertical velocity (gravity / up/down)
     protected double radius = 35; // Default size/radius
+    protected double gravity = 0.4;
     protected double rotation; // current rotation angle in radians
     protected double rotationSpeed; // how much a rotation changes each update
     public static final double GRAVITY = 0.4;
-    
+
     public FlyingObject(double startX, double startY, double radius) {
         this.x = startX;
         this.y = startY;
@@ -25,7 +29,9 @@ public abstract class FlyingObject {
         vy += gravity; // Pulls down over time
         x += vx;       // Moves horizontally
         y += vy;       // Moves vertically
-        rotation += rotationSpeed; 
+        cx = x + radius;
+        cy = y + radius;
+        rotation += rotationSpeed;
     }
 
     // Reset method for re-launching the object
@@ -36,36 +42,56 @@ public abstract class FlyingObject {
         this.vy = 0;
         this.rotation = 0;
         this.rotationSpeed = 0;
-        
+
     }
-    
+
+    public void setGravity(double gravity) {
+        this.gravity = gravity;
+    }
+
     public void setXVelocity(double vx) {
         this.vx = vx;
     }
-    
+
     public void setYVelocity(double vy) {
         this.vy = vy;
     }
-    
+
     public void setRotationSpeed(double rotationSpeed) {
         this.rotationSpeed = rotationSpeed;
     }
-    
+
     public void setRotation(double rotation) {
         this.rotation = rotation;
     }
 
-
     // Getters
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getVx() { return vx; }
-    public double getVy() { return vy; }
-    public double getRadius() { return radius; }
-    public double getRotation() { return rotation; }
-      
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getVx() {
+        return vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
 
     // Abstract methods that subclasses (like Fruit) must implement
     public abstract boolean isCompleted();
+
     public abstract void draw(Graphics2D g2, BufferedImage appleImage);
 }

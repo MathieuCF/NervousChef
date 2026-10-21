@@ -20,7 +20,7 @@ public class GameScreen extends javax.swing.JPanel {
 
     private final GamePanel gamePanel;
     private final Timer hudTimer;
-    private BufferedImage background;
+    private final BufferedImage background;
 
     /**
      * Creates new form GameScreen
@@ -34,6 +34,14 @@ public class GameScreen extends javax.swing.JPanel {
 
         gamePanel = new GamePanel();
         add(gamePanel, java.awt.BorderLayout.CENTER);
+        
+        // update the HUD whenever the game panel awards points
+        gamePanel.setScoreListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setScore(gamePanel.getScore());
+            }
+        });
 
         // updates the timer label while the game is running
         hudTimer = new Timer(250, new ActionListener() {
@@ -63,6 +71,7 @@ public class GameScreen extends javax.swing.JPanel {
     // resets game to initial state
     public void reset() {
         gamePanel.reset();
+        setScore(0);
     }
 
     // returns remaining time in seconds
@@ -160,6 +169,9 @@ public class GameScreen extends javax.swing.JPanel {
     public void setPauseListener(ActionListener listener) {
         pauseGameButton.addActionListener(listener);
     }
+    
+    public int getScore() { return gamePanel.getScore(); }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel hudPanel;
     private javax.swing.JButton pauseGameButton;
