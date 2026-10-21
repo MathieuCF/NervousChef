@@ -18,6 +18,9 @@ public class GameOverPanel extends javax.swing.JPanel {
      */
     public GameOverPanel() {
         initComponents();
+        
+        ButtonStyler.styleImageButton(exitButton, "button.png", 140);
+        ButtonStyler.styleImageButton(restartButton, "button.png", 140);
     }
 
     /**
@@ -32,24 +35,21 @@ public class GameOverPanel extends javax.swing.JPanel {
 
         scoreLabel = new javax.swing.JLabel();
         restartButton = new javax.swing.JButton();
-        gameOverLabel = new javax.swing.JLabel();
         exitButton = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
-        scoreLabel.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
-        scoreLabel.setForeground(new java.awt.Color(0, 0, 153));
+        scoreLabel.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        scoreLabel.setForeground(new java.awt.Color(255, 255, 255));
         scoreLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         scoreLabel.setText("Score: ");
         scoreLabel.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.ipadx = 146;
-        gridBagConstraints.ipady = -5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 88, 0, 0);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.insets = new java.awt.Insets(100, 10, 10, 10);
         add(scoreLabel, gridBagConstraints);
 
         restartButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -57,31 +57,20 @@ public class GameOverPanel extends javax.swing.JPanel {
         restartButton.setText("Restart");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 115, 52, 0);
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(restartButton, gridBagConstraints);
-
-        gameOverLabel.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
-        gameOverLabel.setForeground(new java.awt.Color(51, 0, 153));
-        gameOverLabel.setText("Game Over ");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.ipadx = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(91, 102, 0, 46);
-        add(gameOverLabel, gridBagConstraints);
 
         exitButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         exitButton.setForeground(new java.awt.Color(51, 0, 153));
         exitButton.setText("Exit");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 38, 52, 0);
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_END;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(exitButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -102,7 +91,6 @@ public class GameOverPanel extends javax.swing.JPanel {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exitButton;
-    private javax.swing.JLabel gameOverLabel;
     private javax.swing.JButton restartButton;
     private javax.swing.JLabel scoreLabel;
     // End of variables declaration//GEN-END:variables

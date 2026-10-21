@@ -43,10 +43,10 @@ public class MainFrame extends javax.swing.JFrame {
         // display initial timer value
         gameScreen.setTimerSeconds(gameScreen.getSecondsRemaining());
         
-        cardPanel.add(menuPanel, MENU);
-        cardPanel.add(gameOverPanel, GAME_OVER);
+        cardPanel.add(new BackgroundPanel("background.jpeg", menuPanel), MENU);
+        cardPanel.add(new BackgroundPanel("background_1.jpeg",gameOverPanel), GAME_OVER);
         cardPanel.add(gameScreen, GAME);
-        cardPanel.add(pausePanel, PAUSE);
+        cardPanel.add(new BackgroundPanel("game_background.jpeg",pausePanel), PAUSE);
         
         //handles start button by switching from menu screen to game screen
         menuPanel.setStartListener(new ActionListener() {

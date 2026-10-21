@@ -14,12 +14,11 @@ public class ImageLoader {
     }
 
     // Loads image safely and returns null if not found
-    public static BufferedImage load(String path) {
+    public static BufferedImage load(String filename) {
 
         try {
 
-            java.net.URL url =
-                    ImageLoader.class.getResource(path);
+            java.net.URL url = ImageLoader.class.getResource(filename);
 
             if (url != null) {
                 return ImageIO.read(url);
@@ -27,9 +26,7 @@ public class ImageLoader {
 
         } catch (IOException e) {
 
-            System.out.println(
-                    "Failed to load " + path
-            );
+            System.out.println("Failed to load " + filename);
         }
 
         return null;

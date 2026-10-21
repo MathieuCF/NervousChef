@@ -17,6 +17,9 @@ public class PausePanel extends javax.swing.JPanel {
      */
     public PausePanel() {
         initComponents();
+        
+        ButtonStyler.styleImageButton(resumeButton, "button.png", 140);
+        ButtonStyler.styleImageButton(restartButton, "button.png", 140);
     }
 
     /**
@@ -40,20 +43,23 @@ public class PausePanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(130, 97, 147, 0);
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(resumeButton, gridBagConstraints);
 
         restartButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         restartButton.setForeground(new java.awt.Color(51, 0, 153));
         restartButton.setText("Restart");
+        restartButton.addActionListener(this::restartButtonActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(130, 50, 147, 103);
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(restartButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void restartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restartButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_restartButtonActionPerformed
 
     // registers listener when resume button is clicked and MainFrame should call it
     public void setResumeListener(ActionListener listener) {

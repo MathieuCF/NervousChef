@@ -14,10 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Timer;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Random;
-import javax.imageio.ImageIO;
 import java.awt.Paint;
 import java.awt.GradientPaint;
 import java.awt.geom.Path2D;
@@ -29,13 +27,17 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int PANEL_HEIGHT = 500;
     private static final int TICK_DELAY_MS = 16;
     private static final int MAX_TRAIL_POINTS = 35;
-    private static final long GAME_DURATION_MS = 30000; // temp num for testing only 30s
+    private static final long GAME_DURATION_MS = 10000; // temp num for testing only 30s
+
     // used to generate diff fruit types without creating new random object each time
     private final Random random = new Random();
 
-    // TEST ONLY: replace with throw mechanic later
-    private static final int FRUIT_START_X = 600;
-    private static final int FRUIT_START_Y = 450;
+    // constants for launchRandomFruit
+    private static final int LAUNCH_Y = PANEL_HEIGHT;
+    private static final int LAUNCH_MARGIN = 40;
+    private static final double MIN_LAUNCH_SPEED = 14;
+    private static final double MAX_LAUNCH_SPEED = 18;
+    private static final int FRUIT_SIZE = 70;
 
     private final Timer timer;
     private List<Point> trailPoints = new ArrayList<>();
@@ -65,10 +67,12 @@ public class GamePanel extends javax.swing.JPanel {
     private static final double JUICE_MIN_SIZE = 4;
     private static final double JUICE_MAX_SIZE = 8;
 
+
     // Declare the current fruit field
     private Fruit currentFruit;
 
     public GamePanel() {
+
         // initialise enummap
         fruitImages = new EnumMap<>(FruitType.class);
 
@@ -76,7 +80,8 @@ public class GamePanel extends javax.swing.JPanel {
             fruitImages.put(type, ImageLoader.load(type.getImageFile()));
         }
         setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT));
-        setBackground(Color.BLUE);
+        
+        setOpaque(false);
 
         launchRandomFruit();
 
@@ -456,7 +461,6 @@ public class GamePanel extends javax.swing.JPanel {
     public void setTimerExpiredListener(ActionListener listener) {
         this.timerExpiredListener = listener;
     }
-  
 
     // returns a random fruit type
     private FruitType getRandomFruitType() {
@@ -466,22 +470,40 @@ public class GamePanel extends javax.swing.JPanel {
         return fruitTypes[random.nextInt(fruitTypes.length)];
     }
 
+    // helper method for launchRandomFruit
+    private double randomBetween(double min, double max) {
+        return min + random.nextDouble() * (max - min);
+    }
+
     // creates and launches a random fruit
     private void launchRandomFruit() {
         FruitType randomType = getRandomFruitType();
 
-        currentFruit = new Fruit(FRUIT_START_X, FRUIT_START_Y,
-                25, randomType, this);
+        // random start position of fruit
+        double startX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - FRUIT_SIZE - LAUNCH_MARGIN);
+        double startY = LAUNCH_Y;
 
-        currentFruit.subFruit = false;
+        currentFruit = new Fruit(startX, startY, 35, randomType, this);
 
-        // for test only purpose (should relace with throw mechanic)
-        currentFruit.setXVelocity(-3.5);
-        currentFruit.setYVelocity(-12);
+        // random vertical launch speed
+        double vy = -randomBetween(MIN_LAUNCH_SPEED, MAX_LAUNCH_SPEED);
+
+        // flight time
+        double flightTicks = 2 * Math.abs(vy) / FlyingObject.GRAVITY;
+
+        // pick where fruit land to guarantee it stays on screen 
+        double targetX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - FRUIT_SIZE - LAUNCH_MARGIN);
+
+        // horizontal speed
+        double vx = (targetX - startX) / flightTicks;
 
         // random clockwise or anticlockwise spinning
         double spinSpeed = random.nextBoolean() ? 0.05 : -0.05;
 
+        currentFruit.subFruit = false;
+        
+        currentFruit.setXVelocity(vx);
+        currentFruit.setYVelocity(vy);
         currentFruit.setRotationSpeed(spinSpeed);
         activeObjects.add(currentFruit);
     }
@@ -490,14 +512,14 @@ public class GamePanel extends javax.swing.JPanel {
         for (int i = 0; i < JUICE_COUNT; i++) {
             double angle = random.nextDouble() * Math.PI * 2;
 
-            double speed = JUICE_MIN_SPEED + random.nextDouble() * (JUICE_MAX_SPEED - JUICE_MIN_SPEED);
+            double speed = randomBetween(JUICE_MIN_SPEED, JUICE_MAX_SPEED);
 
             double vx = Math.cos(angle) * speed;
             double vy = Math.sin(angle) * speed;
 
             int life = JUICE_MIN_LIFE + random.nextInt(JUICE_MAX_LIFE - JUICE_MIN_LIFE + 1);
 
-            double size = JUICE_MIN_SIZE + random.nextDouble() * (JUICE_MAX_SIZE - JUICE_MIN_SIZE);
+            double size = randomBetween(JUICE_MIN_SIZE, JUICE_MAX_SIZE);
 
             particles.add(new Particle(position.x, position.y, vx, vy, life, size, color));
 

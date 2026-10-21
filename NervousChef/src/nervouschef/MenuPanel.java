@@ -17,6 +17,8 @@ public class MenuPanel extends javax.swing.JPanel {
      */
     public MenuPanel() {
         initComponents();
+        
+        ButtonStyler.styleImageButton(startButton, "button.png", 180);
     }
 
     /**
@@ -32,34 +34,38 @@ public class MenuPanel extends javax.swing.JPanel {
         titleLabel = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
 
-        setLayout(new java.awt.GridBagLayout());
-
         titleLabel.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
-        titleLabel.setForeground(new java.awt.Color(0, 0, 153));
+        titleLabel.setForeground(new java.awt.Color(255, 255, 255));
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Nervous Chef");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.ipadx = 102;
-        gridBagConstraints.ipady = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(49, 6, 0, 6);
-        add(titleLabel, gridBagConstraints);
 
         startButton.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         startButton.setForeground(new java.awt.Color(0, 0, 153));
         startButton.setText("Start");
-        startButton.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 68;
-        gridBagConstraints.ipady = 27;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(36, 127, 56, 0);
-        add(startButton, gridBagConstraints);
+        startButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(36, 36, 36)
+                .addComponent(titleLabel)
+                .addContainerGap(78, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(startButton)
+                .addGap(15, 15, 15))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(59, 59, 59)
+                .addComponent(titleLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 116, Short.MAX_VALUE)
+                .addComponent(startButton)
+                .addContainerGap())
+        );
     }// </editor-fold>//GEN-END:initComponents
 
     // registers listener when start button is clicked and MainFrame should call it

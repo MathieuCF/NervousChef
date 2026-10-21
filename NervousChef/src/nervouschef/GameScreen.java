@@ -4,9 +4,13 @@
  */
 package nervouschef;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 /**
  *
@@ -15,13 +19,19 @@ import java.awt.event.ActionEvent;
 public class GameScreen extends javax.swing.JPanel {
 
     private final GamePanel gamePanel;
-    private Timer hudTimer;
+    private final Timer hudTimer;
+    private BufferedImage background;
 
     /**
      * Creates new form GameScreen
      */
     public GameScreen() {
         initComponents();
+        
+        hudPanel.setOpaque(false);
+
+        background = ImageLoader.load("game_background.jpeg");
+
         gamePanel = new GamePanel();
         add(gamePanel, java.awt.BorderLayout.CENTER);
 
@@ -70,15 +80,28 @@ public class GameScreen extends javax.swing.JPanel {
     public void setTimerSeconds(int seconds) {
         int minutes = seconds / 60;
         int secs = seconds % 60;
-        timerLabel.setText("Time: " + String.format( "%d:%02d" , minutes, secs
-    
-
-    ));
+        timerLabel.setText("Time: " + String.format("%d:%02d", minutes, secs
+        ));
     }
 
     // registers listener when countdown reaches 0
     public void setTimerExpiredListener(ActionListener listener) {
         gamePanel.setTimerExpiredListener(listener);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        if (background == null) {
+            return;
+        }
+
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        g2.drawImage( background, 0, 0, getWidth(), getHeight(), null);
     }
 
     /**
@@ -93,16 +116,16 @@ public class GameScreen extends javax.swing.JPanel {
         hudPanel = new javax.swing.JPanel();
         scoreLabel = new javax.swing.JLabel();
         timerLabel = new javax.swing.JLabel();
-        pauseGameButton = new javax.swing.JButton();
+        pauseGameButton = new StretchedImageButton("pause_button.png");
 
         setLayout(new java.awt.BorderLayout());
 
-        scoreLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        scoreLabel.setForeground(new java.awt.Color(51, 0, 153));
+        scoreLabel.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        scoreLabel.setForeground(new java.awt.Color(255, 255, 255));
         scoreLabel.setText("Score: ");
 
-        timerLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        timerLabel.setForeground(new java.awt.Color(51, 0, 153));
+        timerLabel.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        timerLabel.setForeground(new java.awt.Color(255, 255, 255));
         timerLabel.setText("Time: ");
 
         javax.swing.GroupLayout hudPanelLayout = new javax.swing.GroupLayout(hudPanel);
@@ -112,7 +135,7 @@ public class GameScreen extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hudPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(scoreLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 274, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 333, Short.MAX_VALUE)
                 .addComponent(timerLabel)
                 .addGap(17, 17, 17))
         );
@@ -123,11 +146,12 @@ public class GameScreen extends javax.swing.JPanel {
                 .addGroup(hudPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(timerLabel)
                     .addComponent(scoreLabel))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(hudPanel, java.awt.BorderLayout.PAGE_START);
 
+        pauseGameButton.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         pauseGameButton.setText("Pause Game");
         add(pauseGameButton, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
