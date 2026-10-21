@@ -105,7 +105,7 @@ public class MainFrame extends javax.swing.JFrame {
         gameScreen.setTimerExpiredListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                showGameOver(0); // replace with actual score later
+                showGameOver(gameScreen.getScore()); // replace with actual score later
             }
         });
         

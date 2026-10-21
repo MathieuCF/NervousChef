@@ -28,6 +28,8 @@ public abstract class FlyingObject {
         vy += gravity; // Pulls down over time
         x += vx;       // Moves horizontally
         y += vy;       // Moves vertically
+        cx = x + radius;
+        cy = y + radius;
         rotation += rotationSpeed; 
     }
 

@@ -19,6 +19,7 @@ import java.util.EnumMap;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import java.awt.Paint;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.geom.Path2D;
 import java.util.Iterator;
@@ -32,6 +33,18 @@ public class GamePanel extends javax.swing.JPanel {
     private static final long GAME_DURATION_MS = 30000; // temp num for testing only 30s
     // used to generate diff fruit types without creating new random object each time
     private final Random random = new Random();
+    
+    private final List<FloatingText>  floatingTexts = new ArrayList<>();
+    
+    private static final Font POINTS_FONT = new Font("Segoe UI", Font.BOLD, 22);
+    private static final Font WORD_FONT = new Font("Segoe UI", Font.BOLD, 32);
+    
+    // fun part, making fruit inspired words ;)
+    private static final String[] OK_WORDS    = {"Sweet", "Fruity", "Yummy", "Tasty"};
+    private static final String[] GOOD_WORDS  = {"Juicy", "Delicious", "Splendid", "Peachy"};
+    private static final String[] GREAT_WORDS = {"Scrumptious!", "Berry Good!", "Juicetastic!", "Zest-acular!"};
+    private static final String[] PERFECT_WORDS = {"Pearfect!!", "Mango-nificent!!", "Suck-culent!!", "Tropical Bliss!!", "Fruit-iculous!!"};  // very creative i know
+    
 
     // TEST ONLY: replace with throw mechanic later
     private static final int FRUIT_START_X = 600;
@@ -64,6 +77,9 @@ public class GamePanel extends javax.swing.JPanel {
 
     private static final double JUICE_MIN_SIZE = 4;
     private static final double JUICE_MAX_SIZE = 8;
+    
+    private int score;
+    private ActionListener scoreListener;  // update HUD when score changes
 
     // Declare the current fruit field
     private Fruit currentFruit;
@@ -153,6 +169,15 @@ public class GamePanel extends javax.swing.JPanel {
                         particleIterator.remove();
                     }
                 }
+                // update floating text (points and praise words)
+                Iterator<FloatingText> textIterator = floatingTexts.iterator();
+                while (textIterator.hasNext()) {
+                    FloatingText t = textIterator.next();
+                    t.update();
+                    if (t.isDead()) {
+                        textIterator.remove();
+                    }
+                }
 
                 // launch replacement fruit after iteration finishes(when done in while loop caused a lag
                 if (spawnNewFruit) {
@@ -223,15 +248,35 @@ public class GamePanel extends javax.swing.JPanel {
                         Vector2D cutDir = Vector2D.between(cutStart, currentPoint);
 
                         // ignore short swipes
-                        if (cutDir.getMagnitude() >= 10) {
+                        if (cutDir.getMagnitude() >= 10) {  // this is where real valid slices get detected
 
                             // mark as touched so this same swipe can't hit again
                             currentFruit.setTouched(true);
+                            
+                            // score the hit
+                            double accuracy = currentFruit.getCutAccuracy(cutStart, currentPoint);
+                            currentFruit.recordAccuracy(accuracy);
+                            
+                            int points = (int) Math.round(currentFruit.getType().getBaseScore()
+                                                    * Fruit.centerMultiplier(accuracy));  // base points * how close u got to the center
+                            addScore(points);
+                            
+                            // "+points" every hit when u cut
+                            spawnFloatingText("+" + points, currentPoint.x, currentPoint.y - 10,
+                                        POINTS_FONT, Color.WHITE, 40);
 
                             spawnJuice(currentPoint, currentFruit.getType().getJuiceColor());
 
                             // takeHit() returns true only on the final hit
                             if (currentFruit.takeHit()) {
+                                float scale = 1.0f + 0.2f * (float) accuracy;
+                                double avgAccuracy = currentFruit.getAverageAccuracy();
+                                // praise word above the fruit, only when it's fully sliced
+                                double fx = currentFruit.getX() + currentFruit.getRadius();  // we can make this better to spawn it more randomly around the cut    
+                                double fy = currentFruit.getY() - 15;
+                                spawnFloatingText(pickPraise(avgAccuracy), fx, fy,
+                                        WORD_FONT.deriveFont(WORD_FONT.getSize2D() * scale), praiseColor(avgAccuracy), 60);
+
                                 currentFruit.slice(cutDir, previousPoint, 0.5);
                             }
                         }
@@ -253,6 +298,10 @@ public class GamePanel extends javax.swing.JPanel {
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
 
+    }
+    
+    public void setScoreListener(ActionListener listener) {
+        this.scoreListener = listener;
     }
 
     @Override
@@ -282,6 +331,10 @@ public class GamePanel extends javax.swing.JPanel {
 
         // draw particles/splatter
         drawParticles(g2);
+        
+        for (FloatingText t : floatingTexts) {
+            t.draw(g2, getWidth());
+        }
     }
 
     private void drawTrail(Graphics2D g2) {
@@ -438,16 +491,34 @@ public class GamePanel extends javax.swing.JPanel {
             trailPoints.clear();
         }
         previousPoint = null;
-
         gameTimer.reset();
-
         activeObjects.clear();
-
         particles.clear();
-
         launchRandomFruit();
+        score = 0;
 
         repaint();
+    }
+    
+    private String pickPraise(double accuracy) {
+        String[] pool;
+        if (accuracy >= 0.9)       pool = PERFECT_WORDS;
+        else if (accuracy >= 0.75) pool = GREAT_WORDS;
+        else if (accuracy >= 0.5)  pool = GOOD_WORDS;
+        else                       pool = OK_WORDS;
+    
+        return pool[random.nextInt(pool.length)];  // pick random from list
+    }
+    
+    private Color praiseColor(double accuracy) {
+        if (accuracy >= 0.9)  return new Color(255, 120, 200);  // hot pink
+        if (accuracy >= 0.75) return new Color(255, 200, 40);   // mango yellow
+        if (accuracy >= 0.4)  return new Color(120, 230, 120);  // lime
+        return Color.WHITE;
+    }
+    
+    private void spawnFloatingText(String text, double x, double y, Font font, Color color, int life) {
+        floatingTexts.add(new FloatingText(text, x, y, life, font, color));
     }
 
     public int getSecondsRemaining() {
@@ -507,6 +578,15 @@ public class GamePanel extends javax.swing.JPanel {
 
         }
     }
+    
+    private void addScore(int points) {
+        score += points;
+        if (scoreListener != null) {
+            scoreListener.actionPerformed(
+                new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "SCORE"));
+        }
+    }
+    public int getScore() { return score; }
 
     // draw juice splash particles over fruit
     private void drawParticles(Graphics2D g2) {
