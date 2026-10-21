@@ -21,6 +21,8 @@ public abstract class FlyingObject {
         this.x = startX;
         this.y = startY;
         this.radius = radius;
+        this.cx = x + radius;
+        this.cy = y + radius;
     }
 
     // Full physics update (Arc trajectory)
@@ -31,7 +33,7 @@ public abstract class FlyingObject {
         y += vy;       // Moves vertically
         cx = x + radius;
         cy = y + radius;
-        rotation += rotationSpeed;
+        rotation += rotationSpeed; 
     }
 
     // Reset method for re-launching the object
