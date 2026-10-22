@@ -2,6 +2,7 @@ package nervouschef;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Set;
 
 
 /*
@@ -25,6 +26,10 @@ public class MainFrame extends javax.swing.JFrame {
     private static final String GAME_OVER = "GAME_OVER";
     private static final String GAME = "GAME";
     private static final String PAUSE = "PAUSE";
+    
+    // Initialize music (rayman origins dashing thru the fire)
+    // normal volume (dB), muffled volume (dB), muffle cutoff (Hz)
+    private final MusicPlayer music = new MusicPlayer("sounds/music.wav", -10f, -10f, 800);
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
 
@@ -119,6 +124,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     //displays main menu and stops game loop
     public void showMenu() {
+        music.setMuffled(true);
+        music.play();
+        
         gameScreen.stopGameLoop();
         cardLayout.show(cardPanel, MENU);
 
@@ -126,6 +134,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     //displays game over screen, stops the current session and displays the final score
     public void showGameOver(int score) {
+        music.setMuffled(true);
+        
         gameScreen.stopGameLoop();
         gameOverPanel.setScore(score);
         cardLayout.show(cardPanel, GAME_OVER);
@@ -133,12 +143,17 @@ public class MainFrame extends javax.swing.JFrame {
 
     // switched to game screen and starts game loop
     public void showGame() {
+        music.play();
+        music.setMuffled(false);
+        
         gameScreen.startGameLoop();
         cardLayout.show(cardPanel, GAME);
     }
 
     //disp pause screen, pauses current session and displays both buttons
     public void showPause() {
+        music.setMuffled(true);
+        
         gameScreen.stopGameLoop();
         cardLayout.show(cardPanel, PAUSE);
     }
