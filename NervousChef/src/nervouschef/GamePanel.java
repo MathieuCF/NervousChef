@@ -86,6 +86,9 @@ public class GamePanel extends javax.swing.JPanel {
 
     // Declare the current fruit field
     private Fruit currentFruit;
+    
+    // Initialize sound effects
+    private final SoundPlayer cutSounds = new SoundPlayer("sounds/", "cut", 12, -4f);  // last param is volume reduction in DB, adjust by ear
 
     public GamePanel() {
         // initialise enummap
@@ -269,7 +272,8 @@ public class GamePanel extends javax.swing.JPanel {
                             spawnFloatingText("+" + points, currentPoint.x, currentPoint.y - 10,
                                     POINTS_FONT, Color.WHITE, 40);
 
-                            spawnJuice(currentPoint, currentFruit.getType().getJuiceColor());
+                            spawnJuice(currentPoint, currentFruit.getType().getJuiceColor());  // particle effect
+                            cutSounds.playRandom();  // sound effect
 
                             // takeHit() returns true only on the final hit
                             if (currentFruit.takeHit()) {
