@@ -4,13 +4,15 @@
  */
 package nervouschef;
 
+import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
+
 
 /**
  *
@@ -20,21 +22,18 @@ public class GameScreen extends javax.swing.JPanel {
 
     private final GamePanel gamePanel;
     private final Timer hudTimer;
-    private final BufferedImage background;
 
     /**
      * Creates new form GameScreen
      */
     public GameScreen() {
         initComponents();
-        
-        hudPanel.setOpaque(false);
 
-        background = ImageLoader.load("game_background.jpeg");
+        hudPanel.setOpaque(false);
 
         gamePanel = new GamePanel();
         add(gamePanel, java.awt.BorderLayout.CENTER);
-        
+
         // update the HUD whenever the game panel awards points
         gamePanel.setScoreListener(new ActionListener() {
             @Override
@@ -54,20 +53,19 @@ public class GameScreen extends javax.swing.JPanel {
             }
         });
 
-
     }
 
     // starts game loop allows rendering to begin
     public void startGameLoop() {
         gamePanel.startGameLoop();
-        
+
         hudTimer.start();
     }
 
     // stops game loop pausing all game updates and rendering
     public void stopGameLoop() {
         gamePanel.stopGameLoop();
-        
+
         hudTimer.stop();
     }
 
@@ -107,13 +105,11 @@ public class GameScreen extends javax.swing.JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        if (background == null) {
-            return;
-        }
+        GradientPaint sky = new GradientPaint(0, 0, new Color(120, 200, 255), 0, getHeight(), new Color(240, 250, 255));
 
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.setPaint(sky);
 
-        g2.drawImage( background, 0, 0, getWidth(), getHeight(), null);
+        g2.fillRect(0, 0, getWidth(), getHeight());
     }
 
     /**
@@ -172,9 +168,11 @@ public class GameScreen extends javax.swing.JPanel {
     public void setPauseListener(ActionListener listener) {
         pauseGameButton.addActionListener(listener);
     }
-    
-    public int getScore() { return gamePanel.getScore(); }
-    
+
+    public int getScore() {
+        return gamePanel.getScore();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel hudPanel;
     private javax.swing.JButton pauseGameButton;

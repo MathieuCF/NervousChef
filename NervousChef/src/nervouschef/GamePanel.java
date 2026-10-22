@@ -14,10 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Timer;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Random;
-import javax.imageio.ImageIO;
 import java.awt.Paint;
 import java.awt.Font;
 import java.awt.GradientPaint;
@@ -30,7 +28,7 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int PANEL_HEIGHT = 500;
     private static final int TICK_DELAY_MS = 16;
     private static final int MAX_TRAIL_POINTS = 35;
-    private static final long GAME_DURATION_MS = 180000; 
+    private static final long GAME_DURATION_MS = 5000;
 
     // used to generate diff fruit types without creating new random object each time
     private final Random random = new Random();
@@ -83,10 +81,15 @@ public class GamePanel extends javax.swing.JPanel {
 
     // Declare the current fruit field
     private Fruit currentFruit;
-    
+
     // Initialize sound effects
     private final SoundPlayer cutSounds = new SoundPlayer("sounds/", "cut", 12, -4f);  // last param is volume reduction in DB, adjust by ear
 
+    /**
+     *
+     * The play area. Runs the game loop, launches fruit, handles mouse slicing,
+     * scoring and drawing.
+     */
     public GamePanel() {
         // initialise enummap
         fruitImages = new EnumMap<>(FruitType.class);
@@ -563,9 +566,9 @@ public class GamePanel extends javax.swing.JPanel {
     // creates and launches a random fruit
     private void launchRandomFruit() {
         FruitType randomType = getRandomFruitType();
-        
+
         double radius = 35 * randomType.getSizeScale();
-        
+
         double fruitDiameter = radius * 2;
 
         // random start position of fruit
@@ -577,12 +580,12 @@ public class GamePanel extends javax.swing.JPanel {
         currentFruit.setGravity(0.4 - 0.05 * (hits - 1));  // 0.4 grav at 1 hit, 0.35 at 2, and 0.3 at 3
 
         double gravity = currentFruit.getGravity();
-        
+
         double peakHeight = randomBetween(MIN_PEAK_HEIGHT, MAX_PEAK_HEIGHT);
-        
+
         // vertical launch speed
         double vy = -Math.sqrt(2 * gravity * peakHeight);
-        
+
         // flight time 
         double flightTicks = 2 * Math.abs(vy) / gravity;
 

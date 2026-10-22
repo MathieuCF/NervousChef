@@ -17,6 +17,11 @@ public abstract class FlyingObject {
     public static final double GRAVITY = 0.4;
     protected double gravity = GRAVITY;
 
+    /**
+     *
+     * Abstract base class for anything that flies: position, velocity, gravity
+     * and rotation, updated every tick.
+     */
     public FlyingObject(double startX, double startY, double radius) {
         this.x = startX;
         this.y = startY;

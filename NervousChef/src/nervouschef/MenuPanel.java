@@ -116,33 +116,18 @@ public class MenuPanel extends javax.swing.JPanel {
 
         double vy = -Math.sin(angle) * speed;
 
-        // spawn either a single bird or a flock
-        int flockSize = 1;
+        double size = MIN_BIRD_SIZE + random.nextDouble() * (MAX_BIRD_SIZE - MIN_BIRD_SIZE);
 
-        if (random.nextDouble() < 0.30) {
-            flockSize = 3 + random.nextInt(3); // 3–5 birds
-        }
+        double flapSpeed = MIN_FLAP_SPEED + random.nextDouble() * (MAX_FLAP_SPEED - MIN_FLAP_SPEED);
 
-        for (int i = 0; i < flockSize; i++) {
+        int alpha = 120 + random.nextInt(136);
 
-            double xOffset = random.nextInt(40);
+        birds.add(new Bird(startX, startY, vx, vy, size, flapSpeed, alpha));
 
-            double yOffset = random.nextInt(25);
-
-            double size = MIN_BIRD_SIZE + random.nextDouble() * (MAX_BIRD_SIZE - MIN_BIRD_SIZE);
-
-            double flapSpeed = MIN_FLAP_SPEED + random.nextDouble() * (MAX_FLAP_SPEED - MIN_FLAP_SPEED);
-
-            int alpha = 120 + random.nextInt(136);
-
-            birds.add(new Bird(startX - xOffset, startY + yOffset, vx, vy, size, flapSpeed, alpha));
-        }
     }
 
     @Override
-    protected void paintComponent(Graphics g
-    ) {
-
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
@@ -162,42 +147,34 @@ public class MenuPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         titleLabel = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
 
-        titleLabel.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
+        setLayout(new java.awt.GridBagLayout());
+
+        titleLabel.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         titleLabel.setForeground(new java.awt.Color(255, 255, 255));
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Nervous Chef");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(90, 20, 0, 10);
+        add(titleLabel, gridBagConstraints);
 
         startButton.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         startButton.setForeground(new java.awt.Color(0, 0, 153));
         startButton.setText("Start");
         startButton.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(titleLabel)
-                .addContainerGap(78, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(startButton)
-                .addGap(29, 29, 29))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(59, 59, 59)
-                .addComponent(titleLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
-                .addComponent(startButton)
-                .addGap(14, 14, 14))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.insets = new java.awt.Insets(300, 10, 0, 10);
+        add(startButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     // registers listener when start button is clicked and MainFrame should call it

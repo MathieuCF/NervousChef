@@ -4,6 +4,10 @@
  */
 package nervouschef;
 
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
 
 /**
@@ -70,6 +74,20 @@ public class PausePanel extends javax.swing.JPanel {
     public void setRestartListener(ActionListener listener) {
         restartButton.addActionListener(listener);
     }
+    
+      @Override
+    protected void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        GradientPaint sky = new GradientPaint(0, 0, new Color(120, 200, 255), 0, getHeight(), new Color(240, 250, 255));
+
+        g2.setPaint(sky);
+
+        g2.fillRect(0, 0, getWidth(), getHeight());
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton restartButton;
     private javax.swing.JButton resumeButton;
