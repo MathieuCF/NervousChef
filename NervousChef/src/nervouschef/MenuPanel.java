@@ -1,24 +1,157 @@
 package nervouschef;
+
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import javax.swing.Timer;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-
-/**
- *
- * @author lailx
- */
 public class MenuPanel extends javax.swing.JPanel {
 
-    /**
-     * Creates new form MenuPanel
-     */
+    private final List<Bird> birds = new ArrayList<>();
+    private Timer birdTimer;
+    private int spawnCountdown;
+    private final Random random = new Random();
+
+    // constants
+    private static final int BIRD_TICK_MS = 16;
+    private static final double MIN_BIRD_SPEED = 2.0;
+    private static final double MAX_BIRD_SPEED = 4.0;
+    private static final double MIN_BIRD_SIZE = 12;
+    private static final double MAX_BIRD_SIZE = 28;
+    private static final double MIN_FLAP_SPEED = 0.15;
+    private static final double MAX_FLAP_SPEED = 0.30;
+    private static final int MIN_SPAWN_INTERVAL = 40;
+    private static final int MAX_SPAWN_INTERVAL = 100;
+    private static final int MAX_BIRDS = 20;
+
     public MenuPanel() {
         initComponents();
-        
+
+        spawnCountdown = MIN_SPAWN_INTERVAL;
+
         ButtonStyler.styleImageButton(startButton, "button.png", 180);
+
+        birdTimer = new Timer(BIRD_TICK_MS, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Iterator<Bird> iterator = birds.iterator();
+
+                while (iterator.hasNext()) {
+
+                    Bird bird = iterator.next();
+
+                    bird.update();
+
+                    if (bird.isOffScreen(getWidth(), getHeight())) {
+
+                        iterator.remove();
+                    }
+                }
+
+                spawnCountdown--;
+
+                if (spawnCountdown <= 0 && birds.size() < MAX_BIRDS) {
+
+                    spawnBird();
+
+                    spawnCountdown = random.nextInt(MAX_SPAWN_INTERVAL - MIN_SPAWN_INTERVAL + 1) + MIN_SPAWN_INTERVAL;
+                }
+
+                repaint();
+            }
+        });
+
+        addHierarchyListener(
+                new HierarchyListener() {
+
+            @Override
+            public void hierarchyChanged(HierarchyEvent e
+            ) {
+
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+
+                    if (isShowing()) {
+
+                        birdTimer.start();
+
+                    } else {
+
+                        birdTimer.stop();
+                    }
+                }
+            }
+        }
+        );
+
+    }
+
+    private void spawnBird() {
+
+        if (getWidth() == 0 || getHeight() == 0) {
+            return;
+        }
+
+        double startX = -20 + random.nextInt(20);
+
+        double startY = getHeight() + random.nextInt(20);
+
+        double speed = MIN_BIRD_SPEED + random.nextDouble() * (MAX_BIRD_SPEED - MIN_BIRD_SPEED);
+
+        double angle = Math.toRadians(25 + random.nextDouble() * 30);
+
+        double vx = Math.cos(angle) * speed;
+
+        double vy = -Math.sin(angle) * speed;
+
+        // spawn either a single bird or a flock
+        int flockSize = 1;
+
+        if (random.nextDouble() < 0.30) {
+            flockSize = 3 + random.nextInt(3); // 3–5 birds
+        }
+
+        for (int i = 0; i < flockSize; i++) {
+
+            double xOffset = random.nextInt(40);
+
+            double yOffset = random.nextInt(25);
+
+            double size = MIN_BIRD_SIZE + random.nextDouble() * (MAX_BIRD_SIZE - MIN_BIRD_SIZE);
+
+            double flapSpeed = MIN_FLAP_SPEED + random.nextDouble() * (MAX_FLAP_SPEED - MIN_FLAP_SPEED);
+
+            int alpha = 120 + random.nextInt(136);
+
+            birds.add(new Bird(startX - xOffset, startY + yOffset, vx, vy, size, flapSpeed, alpha));
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g
+    ) {
+
+        super.paintComponent(g);
+
+        Graphics2D g2 = (Graphics2D) g;
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        for (Bird bird : birds) {
+            bird.draw(g2);
+        }
     }
 
     /**
@@ -73,7 +206,7 @@ public class MenuPanel extends javax.swing.JPanel {
         startButton.addActionListener(listener);
     }
 
-   
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton startButton;
     private javax.swing.JLabel titleLabel;
