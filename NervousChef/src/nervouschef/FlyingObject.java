@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 public abstract class FlyingObject {
+
     protected double x;
     protected double y;
     protected double cx;
@@ -11,10 +12,10 @@ public abstract class FlyingObject {
     protected double vx; // Horizontal velocity (moves left/right)
     protected double vy; // Vertical velocity (gravity / up/down)
     protected double radius = 35; // Default size/radius
-    protected double gravity = 0.4;
     protected double rotation; // current rotation angle in radians
     protected double rotationSpeed; // how much a rotation changes each update
     public static final double GRAVITY = 0.4;
+    protected double gravity = GRAVITY;
 
     public FlyingObject(double startX, double startY, double radius) {
         this.x = startX;
@@ -26,7 +27,6 @@ public abstract class FlyingObject {
 
     // Full physics update (Arc trajectory)
     public void update() {
-        double gravity = GRAVITY;
         vy += gravity; // Pulls down over time
         x += vx;       // Moves horizontally
         y += vy;       // Moves vertically
@@ -67,15 +67,36 @@ public abstract class FlyingObject {
     }
 
     // Getters
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getVx() { return vx; }
-    public double getVy() { return vy; }
-    public double getRadius() { return radius; }
-    public double getRotation() { return rotation; }
+    public double getX() {
+        return x;
+    }
 
+    public double getY() {
+        return y;
+    }
+
+    public double getVx() {
+        return vx;
+    }
+
+    public double getVy() {
+        return vy;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+
+    public double getGravity() {
+        return gravity;
+    }
 
     // Abstract methods that subclasses (like Fruit) must implement
     public abstract boolean isCompleted();
+
     public abstract void draw(Graphics2D g2, BufferedImage appleImage);
 }

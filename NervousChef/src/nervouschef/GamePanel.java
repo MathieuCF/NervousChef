@@ -30,7 +30,7 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int PANEL_HEIGHT = 500;
     private static final int TICK_DELAY_MS = 16;
     private static final int MAX_TRAIL_POINTS = 35;
-    private static final long GAME_DURATION_MS = 120000; // temp num for testing only 30s
+    private static final long GAME_DURATION_MS = 60000; 
 
     // used to generate diff fruit types without creating new random object each time
     private final Random random = new Random();
@@ -49,8 +49,8 @@ public class GamePanel extends javax.swing.JPanel {
     // constants for launchRandomFruit
     private static final int LAUNCH_Y = PANEL_HEIGHT;
     private static final int LAUNCH_MARGIN = 40;
-    private static final double MIN_LAUNCH_SPEED = 14;
-    private static final double MAX_LAUNCH_SPEED = 18;
+    private static final double MIN_PEAK_HEIGHT = 250;
+    private static final double MAX_PEAK_HEIGHT = 420;
     private static final int FRUIT_SIZE = 70;
 
     private final Timer timer;
@@ -498,6 +498,7 @@ public class GamePanel extends javax.swing.JPanel {
         gameTimer.reset();
         activeObjects.clear();
         particles.clear();
+        floatingTexts.clear();
         launchRandomFruit();
         score = 0;
 
@@ -570,11 +571,15 @@ public class GamePanel extends javax.swing.JPanel {
         int hits = randomType.getSlicesRequired();
         currentFruit.setGravity(0.4 - 0.05 * (hits - 1));  // 0.4 grav at 1 hit, 0.35 at 2, and 0.3 at 3
 
-        // random vertical launch speed
-        double vy = -randomBetween(MIN_LAUNCH_SPEED, MAX_LAUNCH_SPEED);
-
-        // flight time
-        double flightTicks = 2 * Math.abs(vy) / FlyingObject.GRAVITY;
+        double gravity = currentFruit.getGravity();
+        
+        double peakHeight = randomBetween(MIN_PEAK_HEIGHT, MAX_PEAK_HEIGHT);
+        
+        // vertical launch speed
+        double vy = -Math.sqrt(2 * gravity * peakHeight);
+        
+        // flight time 
+        double flightTicks = 2 * Math.abs(vy) / gravity;
 
         // pick where fruit land to guarantee it stays on screen 
         double targetX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - FRUIT_SIZE - LAUNCH_MARGIN);
