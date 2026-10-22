@@ -162,7 +162,7 @@ public class MenuPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets = new java.awt.Insets(90, 20, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(200, 20, 0, 10);
         add(titleLabel, gridBagConstraints);
 
         startButton.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
@@ -173,7 +173,7 @@ public class MenuPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.insets = new java.awt.Insets(300, 10, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(200, 10, 0, 10);
         add(startButton, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
