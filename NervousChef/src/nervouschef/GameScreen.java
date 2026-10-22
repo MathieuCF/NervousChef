@@ -54,18 +54,21 @@ public class GameScreen extends javax.swing.JPanel {
             }
         });
 
-        hudTimer.start();
 
     }
 
     // starts game loop allows rendering to begin
     public void startGameLoop() {
         gamePanel.startGameLoop();
+        
+        hudTimer.start();
     }
 
     // stops game loop pausing all game updates and rendering
     public void stopGameLoop() {
         gamePanel.stopGameLoop();
+        
+        hudTimer.stop();
     }
 
     // resets game to initial state

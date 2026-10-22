@@ -100,7 +100,7 @@ public class MainFrame extends javax.swing.JFrame {
         gameScreen.setPauseListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showPause(); // replace with atctual score
+                showPause(); 
                 //when the game is paused, end current session goes to gameoverpanel/screen
             }
         });
@@ -109,7 +109,8 @@ public class MainFrame extends javax.swing.JFrame {
         gameScreen.setTimerExpiredListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showGameOver(gameScreen.getScore()); // replace with actual score later
+                showGameOver(gameScreen.getScore()); // replace with actual score later(done)
+                // actual score code
             }
         });
 

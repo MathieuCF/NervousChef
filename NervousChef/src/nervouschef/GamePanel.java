@@ -30,7 +30,7 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int PANEL_HEIGHT = 500;
     private static final int TICK_DELAY_MS = 16;
     private static final int MAX_TRAIL_POINTS = 35;
-    private static final long GAME_DURATION_MS = 60000; 
+    private static final long GAME_DURATION_MS = 180000; 
 
     // used to generate diff fruit types without creating new random object each time
     private final Random random = new Random();
@@ -51,7 +51,6 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int LAUNCH_MARGIN = 40;
     private static final double MIN_PEAK_HEIGHT = 250;
     private static final double MAX_PEAK_HEIGHT = 420;
-    private static final int FRUIT_SIZE = 70;
 
     private final Timer timer;
     private List<Point> trailPoints = new ArrayList<>();
@@ -63,21 +62,19 @@ public class GamePanel extends javax.swing.JPanel {
     private long previousTickTime;
     private ActionListener timerExpiredListener;
 
+    // draw trail constants
     private static final float TRAIL_MIN_WIDTH = 1f;
     private static final float TRAIL_MAX_WIDTH = 10f;
-
     private static final int TRAIL_MIN_ALPHA = 0;
     private static final int TRAIL_MAX_ALPHA = 180;
 
+    // juice particle declartions and constants
     private final List<Particle> particles = new ArrayList<>();
     private static final int JUICE_COUNT = 15;
-
     private static final double JUICE_MIN_SPEED = 2;
     private static final double JUICE_MAX_SPEED = 7;
-
     private static final int JUICE_MIN_LIFE = 25;
     private static final int JUICE_MAX_LIFE = 45;
-
     private static final double JUICE_MIN_SIZE = 4;
     private static final double JUICE_MAX_SIZE = 8;
 
@@ -566,12 +563,16 @@ public class GamePanel extends javax.swing.JPanel {
     // creates and launches a random fruit
     private void launchRandomFruit() {
         FruitType randomType = getRandomFruitType();
+        
+        double radius = 35 * randomType.getSizeScale();
+        
+        double fruitDiameter = radius * 2;
 
         // random start position of fruit
-        double startX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - FRUIT_SIZE - LAUNCH_MARGIN);
+        double startX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - fruitDiameter - LAUNCH_MARGIN);
         double startY = LAUNCH_Y;
 
-        currentFruit = new Fruit(startX, startY, 35, randomType, this);
+        currentFruit = new Fruit(startX, startY, radius, randomType, this);
         int hits = randomType.getSlicesRequired();
         currentFruit.setGravity(0.4 - 0.05 * (hits - 1));  // 0.4 grav at 1 hit, 0.35 at 2, and 0.3 at 3
 
@@ -586,7 +587,7 @@ public class GamePanel extends javax.swing.JPanel {
         double flightTicks = 2 * Math.abs(vy) / gravity;
 
         // pick where fruit land to guarantee it stays on screen 
-        double targetX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - FRUIT_SIZE - LAUNCH_MARGIN);
+        double targetX = randomBetween(LAUNCH_MARGIN, PANEL_WIDTH - fruitDiameter - LAUNCH_MARGIN);
 
         // horizontal speed
         double vx = (targetX - startX) / flightTicks;
