@@ -30,7 +30,7 @@ public class GamePanel extends javax.swing.JPanel {
     private static final int PANEL_HEIGHT = 500;
     private static final int TICK_DELAY_MS = 16;
     private static final int MAX_TRAIL_POINTS = 35;
-    private static final long GAME_DURATION_MS = 10000; // temp num for testing only 30s
+    private static final long GAME_DURATION_MS = 120000; // temp num for testing only 30s
 
     // used to generate diff fruit types without creating new random object each time
     private final Random random = new Random();
