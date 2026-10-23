@@ -99,6 +99,9 @@ public abstract class FlyingObject {
     public double getGravity() {
         return gravity;
     }
+    
+    public double getCx() { return cx; }
+    public double getCy() { return cy; }
 
     // Abstract methods that subclasses (like Fruit) must implement
     public abstract boolean isCompleted();

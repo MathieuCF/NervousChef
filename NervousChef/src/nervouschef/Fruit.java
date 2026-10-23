@@ -30,6 +30,8 @@ public class Fruit extends FlyingObject {
     private int hitFlashFrames;
     private double accuracySum;
     private double accuracyCount;  // These are used to calculate points and praise words
+    private static final int GLOW_DIAMETER = 120;  // size the cached glow images are rendered at
+    private static final java.util.Map<Integer, BufferedImage> GLOW_CACHE = new java.util.HashMap<>();  // to fix problems with framerate 
 
     public Fruit(double startX, double startY, double radius, FruitType type, GamePanel gamePanel) {
         super(startX, startY, radius);
@@ -94,16 +96,13 @@ public class Fruit extends FlyingObject {
         } else if (hitsRemaining == 2) {
             c = new Color(255, 210, 60);  // 2 hits? -> yellow
         } else {
-            c = new Color(46, 68, 54);  // 1 hit? -> green
+            c = new Color(102, 255, 0);  // 1 hit? -> green
         }
         //Color c = hitsRemaining >= 3 ? new Color(255, 70, 70) : new Color(255, 210, 60);
         if (hitFlashFrames > 0) c = Color.WHITE;
         
-        g2.setPaint(new RadialGradientPaint(
-            new Point2D.Double(cx, cy), glowR,
-            new float[]{0f, 0.6f, 1f},
-            new Color[]{withAlpha(c, 220), withAlpha(c, 110), withAlpha(c, 0)}));
-        g2.fillOval((int) (cx - glowR), (int) (cy - glowR), (int) (glowR * 2), (int) (glowR * 2));
+        int d = (int) (glowR * 2);
+        g2.drawImage(getGlowImage(c), (int) (cx - glowR), (int) (cy - glowR), d, d, null);
     }
     
     public double getCutAccuracy(Point cutStart, Point cutEnd) {
@@ -216,6 +215,23 @@ public class Fruit extends FlyingObject {
         this.accuracyCount = 0;
         this.accuracySum = 0;
     }
+    
+    // renders the radial glow for a colour once, then reuses it every frame
+    private static BufferedImage getGlowImage(Color c) {  //straight from stack overflow -> why is java2D so slow
+        return GLOW_CACHE.computeIfAbsent(c.getRGB(), key -> {
+            BufferedImage img = new BufferedImage(GLOW_DIAMETER, GLOW_DIAMETER, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = img.createGraphics();
+            g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+            float r = GLOW_DIAMETER / 2f;
+            g.setPaint(new RadialGradientPaint(
+                    new Point2D.Double(r, r), r,
+                    new float[]{0f, 0.6f, 1f},
+                    new Color[]{withAlpha(c, 220), withAlpha(c, 110), withAlpha(c, 0)}));
+            g.fillOval(0, 0, GLOW_DIAMETER, GLOW_DIAMETER);
+            g.dispose();
+            return img;
+        });
+    }
 
     public boolean lineIntersectsFruit(Point A, Point B) {  // Detects if two points of the slice crossed this fruit
         /**
@@ -231,6 +247,7 @@ public class Fruit extends FlyingObject {
     public boolean isTouched() { return touched; }
     public void setTouched(boolean touched) { this.touched = touched; }
     public int getHitsTotal() { return hitsTotal; }
+    public int getHitsRemaining() { return hitsRemaining; }
 
     
     @Override

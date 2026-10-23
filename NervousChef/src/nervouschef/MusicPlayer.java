@@ -85,7 +85,7 @@ public class MusicPlayer {
             while (running) {
                 for (int i = 0; i < buf.length; i += frameSize) {
                     alpha += (targetAlpha - alpha) * rate;
-                    volume += (targetVolume - volume) * rate;
+                    volume += (targetVolume - volume) * rate;  // slowly transition volume
 
                     for (int c = 0; c < channels; c++) {
                         int idx = pos + c * 2;

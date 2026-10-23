@@ -50,6 +50,10 @@ public class CountdownTimer {
     public int getSecondsRemaining() {
         return (int) Math.ceil(timeRemainingMs / 1000.0);
     }
+    
+    public double getProgress() {
+        return 1.0 - (double) timeRemainingMs / durationMs;
+    }
 
     // returns true when timer reaches zero
     public boolean isFinished() {

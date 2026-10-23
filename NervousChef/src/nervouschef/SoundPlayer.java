@@ -21,6 +21,8 @@ public class SoundPlayer {
     private final Random random = new Random();
     private int lastPlayed = -1;
     private final float volumeDb;
+    private static final long MIN_GAP_NS = 40_000_000L;   // 40 ms
+    private long lastPlayTime = 0;
 
     public SoundPlayer(String folder, String prefix, int count, float volumeDb) {
         this.volumeDb = volumeDb;
@@ -57,11 +59,22 @@ public class SoundPlayer {
             return null;
         }
     }
+    
+    // plays clips on their own thread so a slow clip.stop()/start() never stalls the game
+    // lucky basic java multithreading isnt too hard
+    private final java.util.concurrent.ExecutorService audioThread
+        = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, "sfx");
+        t.setDaemon(true);   // won't keep the program alive on exit
+        return t;
+    });
 
     // plays a random sound, never the same one twice in a row
     public void playRandom() {
         if (sounds.isEmpty()) return;
-
+            long now = System.nanoTime();
+        if (now - lastPlayTime < MIN_GAP_NS) return;
+        lastPlayTime = now;
         int index;
         do {
             index = random.nextInt(sounds.size());
@@ -74,8 +87,10 @@ public class SoundPlayer {
 
         if (clip == null) return;
 
-        clip.stop();
-        clip.setFramePosition(0);
-        clip.start();
+        audioThread.execute(() -> {
+            clip.stop();
+            clip.setFramePosition(0);
+            clip.start();
+        });
     }
 }

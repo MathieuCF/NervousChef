@@ -8,6 +8,12 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+
 
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
@@ -98,20 +104,6 @@ public class GameScreen extends javax.swing.JPanel {
     public void setTimerExpiredListener(ActionListener listener) {
         gamePanel.setTimerExpiredListener(listener);
     }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-
-        GradientPaint sky = new GradientPaint(0, 0, new Color(120, 200, 255), 0, getHeight(), new Color(240, 250, 255));
-
-        g2.setPaint(sky);
-
-        g2.fillRect(0, 0, getWidth(), getHeight());
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -164,6 +156,14 @@ public class GameScreen extends javax.swing.JPanel {
         add(pauseGameButton, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
+    @Override
+    public void doLayout() {
+        super.doLayout();
+
+        // stretch the game panel up behind the HUD so fruit can fly there too, otherwise it cuts (the HUD is drawn on top of it)
+        gamePanel.setBounds(0, 0, getWidth(), pauseGameButton.getY());
+    }
+    
     // registers listener when pause button is clicked and MainFrame should call it
     public void setPauseListener(ActionListener listener) {
         pauseGameButton.addActionListener(listener);
@@ -171,6 +171,65 @@ public class GameScreen extends javax.swing.JPanel {
 
     public int getScore() {
         return gamePanel.getScore();
+    }
+    
+    private BufferedImage skyCache;
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        // no super.paintComponent, the sky covers every pixel anyway
+        if (getWidth() <= 0 || getHeight() <= 0) {
+            return;
+        }
+
+        // only rebuild the sky when the window size changes
+        if (skyCache == null || skyCache.getWidth() != getWidth() || skyCache.getHeight() != getHeight()) {
+            skyCache = createSky(getWidth(), getHeight());
+        }
+
+        g.drawImage(skyCache, 0, 0, null);
+    }
+
+    // draws the sunset once into an image
+    private BufferedImage createSky(int w, int h) {
+        BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // deep purple at the top, through pink and orange, to gold at the horizon
+        g.setPaint(new LinearGradientPaint(0, 0, 0, h,
+                new float[]{0f, 0.35f, 0.6f, 0.82f, 1f},
+                new Color[]{
+                    new Color(45, 30, 100),
+                    new Color(140, 55, 130),
+                    new Color(245, 100, 110),
+                    new Color(255, 165, 80),
+                    new Color(255, 220, 140)}));
+        g.fillRect(0, 0, w, h);
+
+        // soft glow around the sun
+        float sunX = w * 0.72f;
+        float sunY = h * 0.80f;
+        float glowR = h * 0.55f;
+        g.setPaint(new RadialGradientPaint(new Point2D.Float(sunX, sunY), glowR,
+                new float[]{0f, 1f},
+                new Color[]{new Color(255, 230, 150, 200), new Color(255, 200, 120, 0)}));
+        g.fillOval((int) (sunX - glowR), (int) (sunY - glowR), (int) (glowR * 2), (int) (glowR * 2));
+
+        // sun disc
+        float sunR = h * 0.09f;
+        g.setColor(new Color(255, 245, 200));
+        g.fillOval((int) (sunX - sunR), (int) (sunY - sunR), (int) (sunR * 2), (int) (sunR * 2));
+
+        // a few thin cloud streaks
+        g.setColor(new Color(255, 190, 170, 70));
+        g.fillOval((int) (w * 0.08), (int) (h * 0.30), (int) (w * 0.38), (int) (h * 0.05));
+        g.fillOval((int) (w * 0.50), (int) (h * 0.22), (int) (w * 0.30), (int) (h * 0.04));
+        g.setColor(new Color(255, 150, 140, 60));
+        g.fillOval((int) (w * 0.20), (int) (h * 0.50), (int) (w * 0.45), (int) (h * 0.05));
+
+        g.dispose();
+        return img;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
